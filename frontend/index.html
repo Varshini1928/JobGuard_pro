@@ -1,0 +1,4522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobGuard Pro - AI Job Scam Detection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #4cc9f0;
+            --success: #4ade80;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --sidebar-width: 250px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            transition: all 0.3s;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Login & Register Page */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 20px;
+        }
+
+        .auth-card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+        }
+
+        .auth-header {
+            padding: 30px;
+            text-align: center;
+            background-color: var(--dark);
+            color: white;
+            position: relative;
+        }
+
+        .auth-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-header h1 i {
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+
+        .auth-header p {
+            color: var(--gray-light);
+            font-size: 0.9rem;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .auth-tab.active {
+            background-color: var(--primary);
+        }
+
+        .auth-form {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .error-message {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            border-left: 4px solid var(--danger);
+        }
+
+        .success-message {
+            background-color: rgba(74, 222, 128, 0.1);
+            color: var(--success);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            border-left: 4px solid var(--success);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        .auth-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .auth-btn i {
+            margin-right: 10px;
+        }
+
+        .demo-credentials {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: rgba(67, 97, 238, 0.05);
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .demo-credentials p {
+            margin-bottom: 5px;
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--dark);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            padding: 25px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .logo h1 {
+            font-size: 1.4rem;
+            margin-left: 10px;
+        }
+
+        .logo-icon {
+            background-color: var(--primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .user-profile-summary, .admin-profile-summary {
+            padding: 25px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .admin-avatar {
+            background-color: var(--danger);
+        }
+
+        .user-profile-summary h3, .admin-profile-summary h3 {
+            margin-bottom: 5px;
+            font-size: 1.2rem;
+        }
+
+        .user-profile-summary p, .admin-profile-summary p {
+            color: var(--gray-light);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .user-stats, .admin-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--gray-light);
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+            flex-grow: 1;
+        }
+
+        .nav-btn {
+            display: block;
+            width: 100%;
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            color: white;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-btn i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-btn.active {
+            background-color: rgba(67, 97, 238, 0.2);
+            border-left: 4px solid var(--primary);
+        }
+
+        .logout-btn {
+            margin: 20px;
+            padding: 12px;
+            background-color: rgba(239, 68, 68, 0.2);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .logout-btn i {
+            margin-right: 8px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 25px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .header h2 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            margin-right: 20px;
+        }
+
+        .search-box input {
+            padding: 10px 15px 10px 40px;
+            border: 1px solid var(--gray-light);
+            border-radius: 6px;
+            width: 250px;
+            font-size: 0.9rem;
+            background-color: white;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        /* Stats Container */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.5rem;
+        }
+
+        .stat-info h3 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .stat-info p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .stat-card.users .stat-icon {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+
+        .stat-card.scans .stat-icon {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: var(--secondary);
+        }
+
+        .stat-card.real .stat-icon {
+            background-color: rgba(74, 222, 128, 0.1);
+            color: var(--success);
+        }
+
+        .stat-card.fake .stat-icon {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        /* Scanner Mode Selector */
+        .mode-selector {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .mode-selector h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .mode-selector h2 i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .mode-card {
+            background-color: rgba(67, 97, 238, 0.05);
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .mode-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .mode-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .mode-card:nth-child(2) .mode-icon {
+            background-color: var(--secondary);
+        }
+
+        .mode-card:nth-child(3) .mode-icon {
+            background-color: var(--success);
+        }
+
+        .mode-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .mode-card p {
+            color: var(--gray);
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .select-mode-btn {
+            padding: 10px 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .select-mode-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Scanner Container */
+        .scanner-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .scanner-header {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .scanner-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .scanner-header h2 i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .scanner-header p {
+            color: var(--gray);
+        }
+
+        .back-btn {
+            padding: 8px 15px;
+            background-color: var(--gray-light);
+            color: var(--dark);
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: var(--gray);
+            color: white;
+        }
+
+        .back-btn i {
+            margin-right: 8px;
+        }
+
+        .scanner-controls {
+            margin-bottom: 20px;
+        }
+
+        .sample-buttons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .sample-buttons p {
+            margin-right: 10px;
+            color: var(--gray);
+        }
+
+        .sample-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .sample-btn i {
+            margin-right: 8px;
+        }
+
+        .real-sample {
+            background-color: rgba(74, 222, 128, 0.1);
+            color: var(--success);
+        }
+
+        .real-sample:hover {
+            background-color: rgba(74, 222, 128, 0.2);
+        }
+
+        .fake-sample {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .fake-sample:hover {
+            background-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .job-input-container {
+            margin-bottom: 20px;
+        }
+
+        .job-textarea {
+            width: 100%;
+            height: 250px;
+            padding: 15px;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .job-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .textarea-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .clear-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .clear-btn i {
+            margin-right: 5px;
+        }
+
+        /* Image Upload */
+        .image-upload-container {
+            margin-bottom: 20px;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--gray-light);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+        }
+
+        .upload-area i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .upload-area h3 {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .upload-area p {
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .upload-btn {
+            padding: 10px 25px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .upload-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .image-preview {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .error-alert {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            border-left: 4px solid var(--danger);
+        }
+
+        .scan-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+            margin-bottom: 25px;
+        }
+
+        .scan-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .scan-btn:disabled {
+            background-color: var(--gray);
+            cursor: not-allowed;
+        }
+
+        .scan-btn i {
+            margin-right: 10px;
+        }
+
+        /* OCR Status */
+        .ocr-status {
+            background-color: rgba(76, 201, 240, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ocr-status p {
+            display: flex;
+            align-items: center;
+        }
+
+        .ocr-status i {
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+
+        .ocr-progress {
+            flex: 1;
+            height: 6px;
+            background-color: var(--gray-light);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0 15px;
+        }
+
+        .ocr-progress-bar {
+            height: 100%;
+            background-color: var(--secondary);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Result Card */
+        .result-card {
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-card.real {
+            background-color: rgba(74, 222, 128, 0.1);
+            border-left: 5px solid var(--success);
+        }
+
+        .result-card.fake {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left: 5px solid var(--danger);
+        }
+
+        .result-card.uncertain {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-left: 5px solid var(--warning);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .result-header h3 {
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .result-header h3 i {
+            margin-right: 10px;
+        }
+
+        .result-class {
+            margin-left: 10px;
+            font-weight: 800;
+        }
+
+        .result-card.real .result-class {
+            color: var(--success);
+        }
+
+        .result-card.fake .result-class {
+            color: var(--danger);
+        }
+
+        .result-card.uncertain .result-class {
+            color: var(--warning);
+        }
+
+        .confidence-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .result-card.real .confidence-badge {
+            background-color: rgba(74, 222, 128, 0.2);
+            color: var(--success);
+        }
+
+        .result-card.fake .confidence-badge {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .result-card.uncertain .confidence-badge {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .result-details p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .indicators {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .indicator {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .fake-indicators {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .real-indicators {
+            background-color: rgba(74, 222, 128, 0.1);
+            color: var(--success);
+        }
+
+        .indicator-label {
+            font-weight: 600;
+        }
+
+        .indicator-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .warning-message {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--danger);
+            padding: 12px;
+            border-radius: 6px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .warning-message i {
+            color: var(--danger);
+            margin-right: 10px;
+            margin-top: 2px;
+        }
+
+        .scanner-info {
+            background-color: rgba(67, 97, 238, 0.05);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 25px;
+        }
+
+        .scanner-info h4 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .scanner-info h4 i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .scanner-info ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .scanner-info li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        /* Tables */
+        .table-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+        }
+
+        .table-container h3 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .table-container h3 i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: var(--gray-light);
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        tbody tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        td {
+            padding: 15px;
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-badge.active {
+            background-color: rgba(74, 222, 128, 0.2);
+            color: var(--success);
+        }
+
+        .status-badge.inactive {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .confidence-cell {
+            font-weight: 600;
+        }
+
+        .confidence-cell.high {
+            color: var(--success);
+        }
+
+        .confidence-cell.medium {
+            color: var(--warning);
+        }
+
+        .confidence-cell.low {
+            color: var(--danger);
+        }
+
+        /* Profile Page */
+        .profile-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            margin-right: 25px;
+        }
+
+        .profile-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .profile-info p {
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+
+        .profile-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .detail-card {
+            padding: 20px;
+            border-radius: 8px;
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .detail-card h4 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+
+        .detail-card h4 i {
+            margin-right: 10px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .detail-value {
+            color: var(--gray);
+        }
+
+        /* Settings Page */
+        .settings-section {
+            margin-bottom: 30px;
+        }
+
+        .settings-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .settings-section h3 i {
+            margin-right: 10px;
+        }
+
+        .settings-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .settings-toggle {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .settings-toggle input {
+            display: none;
+        }
+
+        .toggle-switch {
+            width: 50px;
+            height: 26px;
+            background-color: var(--gray-light);
+            border-radius: 13px;
+            position: relative;
+            margin-right: 15px;
+            transition: background-color 0.3s;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background-color: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        .settings-toggle input:checked + .toggle-switch {
+            background-color: var(--success);
+        }
+
+        .settings-toggle input:checked + .toggle-switch::after {
+            transform: translateX(24px);
+        }
+
+        .notification-group {
+            margin-bottom: 25px;
+        }
+
+        .notification-group h4 {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .privacy-info {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .privacy-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .privacy-link:hover {
+            text-decoration: underline;
+        }
+
+        .danger-section {
+            border: 2px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .warning-text {
+            color: var(--danger);
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: rgba(239, 68, 68, 0.05);
+            border-radius: 6px;
+        }
+
+        .delete-input-group {
+            margin-top: 20px;
+        }
+
+        .delete-input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .delete-input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--gray-light);
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .danger-btn {
+            padding: 12px 25px;
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .danger-btn:hover {
+            background-color: #dc2626;
+        }
+
+        .danger-btn:disabled {
+            background-color: var(--gray);
+            cursor: not-allowed;
+        }
+
+        /* Analytics Charts */
+        .analytics-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .analytics-header {
+            margin-bottom: 30px;
+        }
+
+        .analytics-header h3 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .analytics-header h3 i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .analytics-header p {
+            color: var(--gray);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-container h4 {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            color: var(--dark);
+        }
+
+        .chart-container h4 i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--gray);
+            font-size: 0.9rem;
+            padding: 20px;
+            border-top: 1px solid var(--gray-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .logo h1, .user-profile-summary h3, .user-profile-summary p, 
+            .admin-profile-summary h3, .admin-profile-summary p,
+            .nav-btn span, .user-stats, .admin-stats {
+                display: none;
+            }
+
+            .logo {
+                justify-content: center;
+                padding: 20px 0;
+            }
+
+            .logo-icon {
+                margin: 0;
+            }
+
+            .user-profile-summary, .admin-profile-summary {
+                padding: 20px 0;
+            }
+
+            .avatar, .admin-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .nav-btn {
+                padding: 15px 0;
+                justify-content: center;
+            }
+
+            .nav-btn i {
+                margin-right: 0;
+                font-size: 1.2rem;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+
+            .search-box input {
+                width: 200px;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mode-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-actions {
+                margin-top: 15px;
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .search-box input {
+                width: 100%;
+            }
+
+            .indicators {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .scanner-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .scanner-header .back-btn {
+                margin-top: 10px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sample-buttons {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-avatar {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+
+            .mode-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Authentication Page (Login & Register) -->
+    <div id="authPage" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1><i class="fas fa-shield-alt"></i> JobGuard Pro</h1>
+                <p>AI-Powered Job Scam Detection System</p>
+                
+                <div class="auth-tabs">
+                    <button id="loginTabBtn" class="auth-tab active">Login</button>
+                    <button id="registerTabBtn" class="auth-tab">Register</button>
+                </div>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                </div>
+
+                <div id="loginError" class="error-message hidden"></div>
+                <div id="loginSuccess" class="success-message hidden"></div>
+
+                <button id="loginBtn" class="auth-btn">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+            
+            <!-- Register Form -->
+            <div id="registerForm" class="auth-form hidden">
+                <div class="form-group">
+                    <label for="registerName">Full Name</label>
+                    <input type="text" id="registerName" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerEmail">Email Address</label>
+                    <input type="email" id="registerEmail" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerUsername">Username</label>
+                    <input type="text" id="registerUsername" placeholder="Choose a username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" placeholder="Create a password (min. 6 chars)" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerConfirmPassword">Confirm Password</label>
+                    <input type="password" id="registerConfirmPassword" placeholder="Confirm your password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerRole">Account Type</label>
+                    <select id="registerRole">
+                        <option value="user">Regular User</option>
+                        <option value="admin">Administrator (Requires Code)</option>
+                    </select>
+                </div>
+
+                <div id="adminCodeGroup" class="form-group hidden">
+                    <label for="adminCode">Admin Access Code</label>
+                    <input type="text" id="adminCode" placeholder="Enter admin access code">
+                </div>
+
+                <div id="registerError" class="error-message hidden"></div>
+                <div id="registerSuccess" class="success-message hidden"></div>
+
+                <button id="registerBtn" class="auth-btn">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+
+                <p style="text-align: center; margin-top: 15px; color: var(--gray);">
+                    Already have an account? <a href="#" id="switchToLogin" style="color: var(--primary); font-weight: 600;">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Dashboard -->
+    <div id="userDashboard" class="dashboard-container hidden">
+        <div class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h1>JobGuard Pro</h1>
+            </div>
+            
+            <div class="user-profile-summary">
+                <div class="avatar" id="userAvatar">J</div>
+                <h3 id="userName">John Doe</h3>
+                <p id="userUsername">@john_doe</p>
+                <div class="user-stats">
+                    <div class="stat">
+                        <span class="stat-value" id="userTotalScans">0</span>
+                        <span class="stat-label">Total Scans</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="userAvgAccuracy">0%</span>
+                        <span class="stat-label">Accuracy</span>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button id="userDashboardBtn" class="nav-btn active">
+                    <i class="fas fa-home"></i> <span>Dashboard</span>
+                </button>
+                <button id="userScannerBtn" class="nav-btn">
+                    <i class="fas fa-search"></i> <span>Job Scanner</span>
+                </button>
+                <button id="userHistoryBtn" class="nav-btn">
+                    <i class="fas fa-history"></i> <span>Scan History</span>
+                </button>
+                <button id="userProfileBtn" class="nav-btn">
+                    <i class="fas fa-user"></i> <span>My Profile</span>
+                </button>
+                <button id="userSettingsBtn" class="nav-btn">
+                    <i class="fas fa-cog"></i> <span>Settings</span>
+                </button>
+            </nav>
+            
+            <button id="userLogoutBtn" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+            </button>
+        </div>
+        
+        <div class="main-content">
+            <!-- User Header -->
+            <div class="header">
+                <h2 id="userPageTitle">Dashboard</h2>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="userSearchInput" placeholder="Search scan history...">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Dashboard Page -->
+            <div id="userDashboardPage">
+                <div class="stats-container">
+                    <div class="stat-card users">
+                        <div class="stat-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="dashboardTotalScans">0</h3>
+                            <p>Total Scans</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card real">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="dashboardRealJobs">0</h3>
+                            <p>Real Jobs Detected</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card fake">
+                        <div class="stat-icon">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="dashboardFakeJobs">0</h3>
+                            <p>Fake Jobs Detected</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card scans">
+                        <div class="stat-icon">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="dashboardAvgConfidence">0%</h3>
+                            <p>Average Confidence</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mode Selector -->
+                <div class="mode-selector">
+                    <h2><i class="fas fa-search-plus"></i> Choose Scanning Mode</h2>
+                    <div class="mode-grid">
+                        <div class="mode-card">
+                            <div class="mode-icon">
+                                <i class="fas fa-font"></i>
+                            </div>
+                            <h3>Text Only</h3>
+                            <p>Paste or type job description, salary, perks and conditions</p>
+                            <button class="select-mode-btn" data-mode="text">Select Text Mode</button>
+                        </div>
+                        
+                        <div class="mode-card">
+                            <div class="mode-icon">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <h3>Image Only</h3>
+                            <p>Upload a job poster image and scan content inside using OCR</p>
+                            <button class="select-mode-btn" data-mode="image">Select Image Mode</button>
+                        </div>
+                        
+                        <div class="mode-card">
+                            <div class="mode-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <h3>Text + Image</h3>
+                            <p>Combine text description and poster image for better accuracy</p>
+                            <button class="select-mode-btn" data-mode="both">Select Combined Mode</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Scanner Pages -->
+            <!-- Text Scanner Page -->
+            <div id="userScannerPageText" class="hidden">
+                <div class="scanner-container">
+                    <div class="scanner-header">
+                        <div>
+                            <h2><i class="fas fa-font"></i> Text-Only Job Scanner</h2>
+                            <p>Paste a job description below to analyze its legitimacy using AI</p>
+                        </div>
+                        <button class="back-btn back-to-dashboard">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </button>
+                    </div>
+                    
+                    <div class="scanner-controls">
+                        <div class="sample-buttons">
+                            <p>Try with sample jobs:</p>
+                            <button id="realSampleBtnText" class="sample-btn real-sample">
+                                <i class="fas fa-check-circle"></i> Load Real Job Sample
+                            </button>
+                            <button id="fakeSampleBtnText" class="sample-btn fake-sample">
+                                <i class="fas fa-times-circle"></i> Load Fake Job Sample
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="job-input-container">
+                        <textarea id="jobTextareaText" class="job-textarea" placeholder="Paste the complete job description here..." rows="12"></textarea>
+                        <div class="textarea-footer">
+                            <span id="charCountText">0 characters</span>
+                            <button id="clearTextBtnText" class="clear-btn">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="scanErrorText" class="error-alert hidden"></div>
+                    
+                    <button id="scanJobBtnText" class="scan-btn">
+                        <i class="fas fa-search"></i> Analyze Job Description
+                    </button>
+                    
+                    <div id="scanResultText" class="result-card hidden">
+                        <!-- Result will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Image Scanner Page -->
+            <div id="userScannerPageImage" class="hidden">
+                <div class="scanner-container">
+                    <div class="scanner-header">
+                        <div>
+                            <h2><i class="fas fa-image"></i> Image-Only Job Scanner</h2>
+                            <p>Upload a job poster image to extract and analyze text using OCR</p>
+                        </div>
+                        <button class="back-btn back-to-dashboard">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </button>
+                    </div>
+                    
+                    <div class="image-upload-container">
+                        <div class="upload-area" id="uploadAreaImage">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h3>Upload Job Poster Image</h3>
+                            <p>Drag & drop or click to select an image file (JPG, PNG, etc.)</p>
+                            <input type="file" id="imageUploadInput" accept="image/*" class="hidden">
+                            <button class="upload-btn">Select Image</button>
+                        </div>
+                        
+                        <div class="image-preview" id="imagePreviewImage">
+                            <img id="previewImage" src="" alt="Uploaded job poster">
+                        </div>
+                    </div>
+                    
+                    <div id="ocrStatusImage" class="ocr-status hidden">
+                        <p><i class="fas fa-spinner fa-spin"></i> <span id="ocrStatusText">Extracting text from image...</span></p>
+                        <div class="ocr-progress">
+                            <div class="ocr-progress-bar" id="ocrProgressBar"></div>
+                        </div>
+                        <span id="ocrProgressPercent">0%</span>
+                    </div>
+                    
+                    <div id="extractedTextContainerImage" class="hidden">
+                        <h4>Extracted Text:</h4>
+                        <textarea id="extractedTextImage" class="job-textarea" rows="8" readonly></textarea>
+                    </div>
+                    
+                    <div id="scanErrorImage" class="error-alert hidden"></div>
+                    
+                    <button id="scanJobBtnImage" class="scan-btn" disabled>
+                        <i class="fas fa-search"></i> Analyze Extracted Text
+                    </button>
+                    
+                    <div id="scanResultImage" class="result-card hidden">
+                        <!-- Result will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Combined Scanner Page -->
+            <div id="userScannerPageBoth" class="hidden">
+                <div class="scanner-container">
+                    <div class="scanner-header">
+                        <div>
+                            <h2><i class="fas fa-file-alt"></i> Text + Image Job Scanner</h2>
+                            <p>Combine text input and image upload for comprehensive analysis</p>
+                        </div>
+                        <button class="back-btn back-to-dashboard">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </button>
+                    </div>
+                    
+                    <div class="job-input-container">
+                        <label for="jobTextareaBoth">Job Description:</label>
+                        <textarea id="jobTextareaBoth" class="job-textarea" placeholder="Type or paste job description here..." rows="8"></textarea>
+                        <div class="textarea-footer">
+                            <span id="charCountBoth">0 characters</span>
+                            <button id="clearTextBtnBoth" class="clear-btn">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="image-upload-container">
+                        <div class="upload-area" id="uploadAreaBoth">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h3>Upload Job Poster Image (Optional)</h3>
+                            <p>Add an image for enhanced analysis (JPG, PNG, etc.)</p>
+                            <input type="file" id="imageUploadInputBoth" accept="image/*" class="hidden">
+                            <button class="upload-btn">Select Image</button>
+                        </div>
+                        
+                        <div class="image-preview" id="imagePreviewBoth">
+                            <img id="previewImageBoth" src="" alt="Uploaded job poster">
+                        </div>
+                    </div>
+                    
+                    <div id="ocrStatusBoth" class="ocr-status hidden">
+                        <p><i class="fas fa-spinner fa-spin"></i> <span id="ocrStatusTextBoth">Extracting text from image...</span></p>
+                        <div class="ocr-progress">
+                            <div class="ocr-progress-bar" id="ocrProgressBarBoth"></div>
+                        </div>
+                        <span id="ocrProgressPercentBoth">0%</span>
+                    </div>
+                    
+                    <div id="scanErrorBoth" class="error-alert hidden"></div>
+                    
+                    <button id="scanJobBtnBoth" class="scan-btn">
+                        <i class="fas fa-search"></i> Analyze Combined Content
+                    </button>
+                    
+                    <div id="scanResultBoth" class="result-card hidden">
+                        <!-- Result will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User History Page -->
+            <div id="userHistoryPage" class="hidden">
+                <div class="stats-container">
+                    <div class="stat-card users">
+                        <div class="stat-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="historyTotalScans">0</h3>
+                            <p>Total Scans</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card real">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="historyRealJobs">0</h3>
+                            <p>Real Jobs Detected</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card fake">
+                        <div class="stat-icon">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="historyFakeJobs">0</h3>
+                            <p>Fake Jobs Detected</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card scans">
+                        <div class="stat-icon">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="historyAvgConfidence">0%</h3>
+                            <p>Average Confidence</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <h3><i class="fas fa-history"></i> Scan History</h3>
+                    <table id="userHistoryTable">
+                        <thead>
+                            <tr>
+                                <th>Job Title</th>
+                                <th>Mode</th>
+                                <th>Date</th>
+                                <th>Result</th>
+                                <th>Confidence</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userHistoryTableBody">
+                            <!-- History rows will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- User Profile Page -->
+            <div id="userProfilePage" class="hidden">
+                <div class="profile-container">
+                    <div class="profile-header">
+                        <div class="profile-avatar" id="profileAvatar">J</div>
+                        <div class="profile-info">
+                            <h3 id="profileName">John Doe</h3>
+                            <p id="profileEmail">john@example.com</p>
+                            <p id="profileUsername">@john_doe</p>
+                            <p id="profileMemberSince">Member since: January 2026</p>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-details">
+                        <div class="detail-card">
+                            <h4><i class="fas fa-chart-bar"></i> Scan Statistics</h4>
+                            <div class="detail-item">
+                                <span class="detail-label">Total Scans:</span>
+                                <span class="detail-value" id="profileTotalScans">0</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Real Jobs Detected:</span>
+                                <span class="detail-value" id="profileRealJobs">0</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Fake Jobs Detected:</span>
+                                <span class="detail-value" id="profileFakeJobs">0</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Average Confidence:</span>
+                                <span class="detail-value" id="profileAvgConfidence">0%</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Last Scan Date:</span>
+                                <span class="detail-value" id="profileLastScan">Never</span>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-card">
+                            <h4><i class="fas fa-user"></i> Account Information</h4>
+                            <div class="detail-item">
+                                <span class="detail-label">User ID:</span>
+                                <span class="detail-value" id="profileUserId">U001</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Account Type:</span>
+                                <span class="detail-value">Standard User</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Last Login:</span>
+                                <span class="detail-value" id="profileLastLogin">2026-01-13 04:35:17</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Status:</span>
+                                <span class="detail-value" id="profileStatus">Active</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Registration Date:</span>
+                                <span class="detail-value" id="profileRegDate">2026-01-01</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Settings Page -->
+            <div id="userSettingsPage" class="hidden">
+                <div class="settings-section">
+                    <h3><i class="fas fa-user-shield"></i> Privacy & Concerns</h3>
+                    <div class="settings-card">
+                        <div class="settings-toggle">
+                            <input type="checkbox" id="privacyDataSharing" checked>
+                            <span class="toggle-switch"></span>
+                            <span>Allow anonymized data sharing for service improvement</span>
+                        </div>
+                        <div class="settings-toggle">
+                            <input type="checkbox" id="privacyJobHistory" checked>
+                            <span class="toggle-switch"></span>
+                            <span>Save job scan history (local browser storage)</span>
+                        </div>
+                        <div class="settings-toggle">
+                            <input type="checkbox" id="privacyAnalytics">
+                            <span class="toggle-switch"></span>
+                            <span>Enable usage analytics (anonymized)</span>
+                        </div>
+                        <div class="privacy-info">
+                            <p class="small-text">Your scanned job data stays private. We never store job descriptions or images on our servers. <a href="#" class="privacy-link" id="privacyPolicyLink">Privacy Policy</a></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3><i class="fas fa-bell"></i> Notifications</h3>
+                    <div class="settings-card">
+                        <div class="notification-group">
+                            <h4>Job Analysis</h4>
+                            <div class="settings-toggle">
+                                <input type="checkbox" id="notifJobResults" checked>
+                                <span class="toggle-switch"></span>
+                                <span>Show detailed analysis results</span>
+                            </div>
+                            <div class="settings-toggle">
+                                <input type="checkbox" id="notifHighRisk" checked>
+                                <span class="toggle-switch"></span>
+                                <span>Alert for high-risk job postings (>80 score)</span>
+                            </div>
+                        </div>
+                        <div class="notification-group">
+                            <h4>Account</h4>
+                            <div class="settings-toggle">
+                                <input type="checkbox" id="notifAccountSecurity" checked>
+                                <span class="toggle-switch"></span>
+                                <span>Security updates & login alerts</span>
+                            </div>
+                        </div>
+                        <button id="resetNotifications" class="scan-btn" style="margin-top: 20px;">
+                            <i class="fas fa-undo"></i> Reset to Defaults
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3><i class="fas fa-trash-alt"></i> Delete Account</h3>
+                    <div class="settings-card danger-section">
+                        <p class="warning-text">This action cannot be undone. All your history and settings will be permanently deleted from this browser.</p>
+                        <div class="delete-input-group">
+                            <label>Type "DELETE" to confirm:</label>
+                            <input type="text" id="deleteConfirmInput" placeholder="Type DELETE here" maxlength="6">
+                            <button id="deleteAccountBtn" class="danger-btn" disabled>Delete my account</button>
+                        </div>
+                        <p id="deleteStatus" class="small-text"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>JobGuard Pro User Dashboard &copy; 2026. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="dashboard-container hidden">
+        <div class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h1>JobGuard Pro</h1>
+            </div>
+            
+            <div class="admin-profile-summary">
+                <div class="avatar admin-avatar">A</div>
+                <h3>Administrator</h3>
+                <p>System Admin</p>
+                <div class="admin-stats">
+                    <div class="stat">
+                        <span class="stat-value" id="adminTotalUsers">0</span>
+                        <span class="stat-label">Total Users</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="adminTotalScans">0</span>
+                        <span class="stat-label">Total Scans</span>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button id="adminOverviewBtn" class="nav-btn active">
+                    <i class="fas fa-tachometer-alt"></i> <span>Overview</span>
+                </button>
+                <button id="adminScansBtn" class="nav-btn">
+                    <i class="fas fa-search"></i> <span>All Scans</span>
+                </button>
+                <button id="adminUsersBtn" class="nav-btn">
+                    <i class="fas fa-users"></i> <span>Users</span>
+                </button>
+                <button id="adminAnalyticsBtn" class="nav-btn">
+                    <i class="fas fa-chart-bar"></i> <span>Analytics</span>
+                </button>
+            </nav>
+            
+            <button id="adminLogoutBtn" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+            </button>
+        </div>
+        
+        <div class="main-content">
+            <!-- Admin Header -->
+            <div class="header">
+                <h2 id="adminPageTitle">Admin Dashboard</h2>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="adminSearchInput" placeholder="Search scans or users...">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Admin Overview Page -->
+            <div id="adminOverviewPage">
+                <div class="stats-container">
+                    <div class="stat-card users">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="adminStatsUsers">0</h3>
+                            <p>Total Users</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card scans">
+                        <div class="stat-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="adminStatsScans">0</h3>
+                            <p>Total Scans</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card real">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="adminStatsReal">0</h3>
+                            <p>Real Jobs Detected</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card fake">
+                        <div class="stat-icon">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="adminStatsFake">0</h3>
+                            <p>Fake Jobs Detected</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <h3><i class="fas fa-history"></i> Recent Scans</h3>
+                    <table id="adminRecentScansTable">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Job Title</th>
+                                <th>Mode</th>
+                                <th>Date</th>
+                                <th>Result</th>
+                                <th>Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminRecentScansTableBody">
+                            <!-- Recent scans will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Admin Scans Page -->
+            <div id="adminScansPage" class="hidden">
+                <div class="table-container">
+                    <h3><i class="fas fa-search"></i> All Scans</h3>
+                    <table id="adminAllScansTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Job Title</th>
+                                <th>Mode</th>
+                                <th>Date</th>
+                                <th>Result</th>
+                                <th>Confidence</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminAllScansTableBody">
+                            <!-- All scans will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Admin Users Page -->
+            <div id="adminUsersPage" class="hidden">
+                <div class="table-container">
+                    <h3><i class="fas fa-users"></i> System Users</h3>
+                    <table id="adminUsersTable">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Scans</th>
+                                <th>Last Login</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminUsersTableBody">
+                            <!-- Users will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Admin Analytics Page -->
+            <div id="adminAnalyticsPage" class="hidden">
+                <div class="analytics-container">
+                    <div class="analytics-header">
+                        <h3><i class="fas fa-chart-bar"></i> System Analytics</h3>
+                        <p>Comprehensive analytics and insights about the JobGuard Pro system</p>
+                    </div>
+                    
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <h4><i class="fas fa-chart-pie"></i> Real vs Fake Jobs Distribution</h4>
+                            <div class="chart-wrapper">
+                                <canvas id="realFakeChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <h4><i class="fas fa-chart-pie"></i> User Activity Distribution</h4>
+                            <div class="chart-wrapper">
+                                <canvas id="userActivityChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <h4><i class="fas fa-chart-pie"></i> Confidence Level Distribution</h4>
+                            <div class="chart-wrapper">
+                                <canvas id="confidenceChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <h4><i class="fas fa-chart-pie"></i> Scans Per Day (Last 7 Days)</h4>
+                            <div class="chart-wrapper">
+                                <canvas id="dailyScansChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <h3><i class="fas fa-table"></i> Analytics Summary</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Value</th>
+                                    <th>Change</th>
+                                    <th>Trend</th>
+                                </tr>
+                            </thead>
+                            <tbody id="analyticsSummaryTable">
+                                <!-- Analytics summary will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>JobGuard Pro Admin Dashboard &copy; 2026. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // APPLICATION STATE & DATA MANAGEMENT
+        // ============================================
+        
+        // Local Storage Keys
+        const STORAGE_KEYS = {
+            USERS: 'jobguard_users',
+            SCANS: 'jobguard_scans',
+            CURRENT_USER: 'jobguard_current_user',
+            SETTINGS: 'jobguard_settings',
+            HISTORY: 'jobguard_history'
+        };
+        
+        // Default admin user (for first-time setup)
+        const DEFAULT_ADMIN = {
+            id: 100,
+            name: 'System Administrator',
+            email: 'admin@jobguard.com',
+            username: 'admin',
+            password: 'admin123',
+            role: 'admin',
+            status: 'active',
+            scans: 0,
+            realJobs: 0,
+            fakeJobs: 0,
+            avgConfidence: 0,
+            memberSince: 'January 2026',
+            lastLogin: new Date().toISOString(),
+            registrationDate: '2026-01-01'
+        };
+        
+        // Default regular user (for demo)
+        const DEFAULT_USER = {
+            id: 1,
+            name: 'Demo User',
+            email: 'test@user.com',
+            username: 'demo_user',
+            password: 'password123',
+            role: 'user',
+            status: 'active',
+            scans: 3,
+            realJobs: 2,
+            fakeJobs: 1,
+            avgConfidence: 85,
+            memberSince: 'January 2026',
+            lastLogin: new Date().toISOString(),
+            registrationDate: '2026-01-01'
+        };
+        
+        // Sample job descriptions
+        const SAMPLE_JOBS = {
+            real: `We are hiring a Senior Software Engineer with 5+ years of experience in Java and Spring Boot. 
+
+Responsibilities:
+- Develop scalable microservices and backend systems
+- Collaborate with cross-functional teams (Product, Design, QA)
+- Mentor junior developers and conduct code reviews
+- Implement best practices for code quality and testing
+
+Requirements:
+- Bachelor's degree in Computer Science or related field
+- 5+ years of software development experience
+- Strong knowledge of Java, Spring Boot, and REST APIs
+- Experience with cloud platforms (AWS/Azure) and containerization
+- Excellent problem-solving and communication skills
+
+Benefits:
+- Competitive salary with performance bonuses
+- Comprehensive health insurance
+- 401k matching program
+- Flexible work hours and remote work options
+- Professional development budget
+
+Interview Process:
+1. Initial phone screening
+2. Technical assessment
+3. On-site interviews (virtual or in-person)
+4. Reference checks
+5. Offer extended`,
+            
+            fake: `URGENT HIRING! WORK FROM HOME - NO EXPERIENCE NEEDED!
+
+Earn $5000+ PER MONTH working just 2-3 hours daily from your home!
+
+We are looking for motivated individuals to join our remote team. No previous experience required - we provide full training!
+
+Job Requirements:
+- Basic computer skills
+- Reliable internet connection
+- Willingness to learn
+- Must be 18+ years old
+
+What You'll Do:
+- Simple data entry tasks
+- Online research
+- Social media management
+- Customer support
+
+IMMEDIATE START AVAILABLE!
+Limited positions - Apply NOW!
+
+TO GET STARTED:
+1. Send your resume to hiring@quickcashjobs.com
+2. Pay the ONE-TIME registration fee of $49.99
+3. Receive your training materials and login credentials
+4. Start earning immediately!
+
+Payment Methods Accepted:
+- PayPal
+- Western Union
+- Bank Transfer
+- Credit Card
+
+DON'T MISS THIS LIMITED TIME OPPORTUNITY!
+Earn money FAST with minimal effort!`
+        };
+        
+        // Fake and real job indicators for NLP simulation
+        const FAKE_INDICATORS = [
+            "upfront payment", "registration fee", "work from home", 
+            "no experience needed", "earn money fast", "get rich quick",
+            "guaranteed income", "send money", "bank details", "urgently hiring",
+            "immediate start", "limited time", "payment required", "cash transfer",
+            "pay to start", "one-time fee", "investment required", "quick cash",
+            "western union", "money transfer", "paypal payment", "high earnings",
+            "no qualifications", "simple tasks", "easy money", "big money",
+            "part time", "full time", "work online", "online job"
+        ];
+        
+        const REAL_INDICATORS = [
+            "competitive salary", "benefits package", "health insurance",
+            "401k", "professional development", "required qualifications",
+            "experience needed", "background check", "interview process",
+            "team collaboration", "degree required", "responsibilities include",
+            "performance review", "training provided", "career growth",
+            "technical skills", "collaborate with", "mentor", "code review",
+            "full-time position", "part-time position", "contract position",
+            "remote work", "office location", "company culture",
+            "annual bonus", "paid time off", "retirement plan", "dental insurance"
+        ];
+        
+        // Application State
+        let currentUser = null;
+        let allUsers = [];
+        let allScans = [];
+        let userScans = [];
+        let userSettings = {
+            privacyDataSharing: true,
+            privacyJobHistory: true,
+            privacyAnalytics: false,
+            notifJobResults: true,
+            notifHighRisk: true,
+            notifAccountSecurity: true,
+            darkMode: true
+        };
+        let charts = {};
+        let currentScannerMode = 'text'; // 'text', 'image', or 'both'
+        
+        // ============================================
+        // DATA MANAGEMENT FUNCTIONS
+        // ============================================
+        
+        function initializeData() {
+            // Initialize users data
+            const storedUsers = localStorage.getItem(STORAGE_KEYS.USERS);
+            if (storedUsers) {
+                allUsers = JSON.parse(storedUsers);
+            } else {
+                // Initialize with default users
+                allUsers = [DEFAULT_ADMIN, DEFAULT_USER];
+                saveUsers();
+            }
+            
+            // Initialize scans data
+            const storedScans = localStorage.getItem(STORAGE_KEYS.SCANS);
+            if (storedScans) {
+                allScans = JSON.parse(storedScans);
+            } else {
+                // Initialize with some sample scans
+                allScans = [
+                    {
+                        id: 1,
+                        userId: 1,
+                        userName: 'Demo User',
+                        userEmail: 'test@user.com',
+                        jobTitle: 'Senior Software Engineer',
+                        jobDescription: SAMPLE_JOBS.real.substring(0, 200) + '...',
+                        result: 'Real',
+                        confidence: 92,
+                        fakeIndicators: 1,
+                        realIndicators: 8,
+                        date: '2026-01-13 04:35:17',
+                        mode: 'text',
+                        status: 'completed'
+                    },
+                    {
+                        id: 2,
+                        userId: 1,
+                        userName: 'Demo User',
+                        userEmail: 'test@user.com',
+                        jobTitle: 'Work From Home Data Entry',
+                        jobDescription: SAMPLE_JOBS.fake.substring(0, 200) + '...',
+                        result: 'Fake',
+                        confidence: 88,
+                        fakeIndicators: 6,
+                        realIndicators: 1,
+                        date: '2026-01-12 14:10:33',
+                        mode: 'text',
+                        status: 'completed'
+                    },
+                    {
+                        id: 3,
+                        userId: 1,
+                        userName: 'Demo User',
+                        userEmail: 'test@user.com',
+                        jobTitle: 'Marketing Intern',
+                        jobDescription: 'Marketing intern position for recent graduates...',
+                        result: 'Real',
+                        confidence: 76,
+                        fakeIndicators: 0,
+                        realIndicators: 5,
+                        date: '2026-01-12 18:22:05',
+                        mode: 'image',
+                        status: 'completed'
+                    },
+                    {
+                        id: 4,
+                        userId: 100,
+                        userName: 'System Administrator',
+                        userEmail: 'admin@jobguard.com',
+                        jobTitle: 'Data Analyst Position',
+                        jobDescription: 'Data analyst job with competitive salary...',
+                        result: 'Real',
+                        confidence: 85,
+                        fakeIndicators: 0,
+                        realIndicators: 6,
+                        date: '2026-01-11 09:15:42',
+                        mode: 'both',
+                        status: 'completed'
+                    }
+                ];
+                saveScans();
+            }
+            
+            // Initialize user settings
+            const storedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+            if (storedSettings) {
+                userSettings = JSON.parse(storedSettings);
+            }
+            
+            // Check for current user
+            const storedCurrentUser = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+            if (storedCurrentUser) {
+                currentUser = JSON.parse(storedCurrentUser);
+                updateUserLastLogin();
+            }
+        }
+        
+        function saveUsers() {
+            localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(allUsers));
+        }
+        
+        function saveScans() {
+            localStorage.setItem(STORAGE_KEYS.SCANS, JSON.stringify(allScans));
+        }
+        
+        function saveSettings() {
+            localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(userSettings));
+        }
+        
+        function saveCurrentUser() {
+            localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(currentUser));
+        }
+        
+        function updateUserLastLogin() {
+            if (currentUser) {
+                currentUser.lastLogin = new Date().toISOString();
+                const userIndex = allUsers.findIndex(u => u.id === currentUser.id);
+                if (userIndex !== -1) {
+                    allUsers[userIndex].lastLogin = currentUser.lastLogin;
+                    saveUsers();
+                    saveCurrentUser();
+                }
+            }
+        }
+        
+        function registerUser(userData) {
+            // Generate unique ID
+            const newId = allUsers.length > 0 ? Math.max(...allUsers.map(u => u.id)) + 1 : 1;
+            
+            const newUser = {
+                id: newId,
+                name: userData.name,
+                email: userData.email,
+                username: userData.username,
+                password: userData.password,
+                role: userData.role,
+                status: 'active',
+                scans: 0,
+                realJobs: 0,
+                fakeJobs: 0,
+                avgConfidence: 0,
+                memberSince: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+                lastLogin: new Date().toISOString(),
+                registrationDate: new Date().toISOString().split('T')[0]
+            };
+            
+            allUsers.push(newUser);
+            saveUsers();
+            
+            return newUser;
+        }
+        
+        function loginUser(email, password) {
+            const user = allUsers.find(u => u.email === email && u.password === password);
+            if (user) {
+                currentUser = { ...user };
+                currentUser.lastLogin = new Date().toISOString();
+                saveCurrentUser();
+                
+                // Update user in allUsers array
+                const userIndex = allUsers.findIndex(u => u.id === user.id);
+                if (userIndex !== -1) {
+                    allUsers[userIndex].lastLogin = currentUser.lastLogin;
+                    saveUsers();
+                }
+                
+                return { success: true, user: currentUser };
+            }
+            return { success: false, message: 'Invalid email or password' };
+        }
+        
+        function addNewScan(scanData) {
+            const newId = allScans.length > 0 ? Math.max(...allScans.map(s => s.id)) + 1 : 1;
+            
+            const newScan = {
+                id: newId,
+                userId: currentUser.id,
+                userName: currentUser.name,
+                userEmail: currentUser.email,
+                jobTitle: scanData.title,
+                jobDescription: scanData.description.substring(0, 200) + (scanData.description.length > 200 ? '...' : ''),
+                result: scanData.classification,
+                confidence: scanData.confidence,
+                fakeIndicators: scanData.indicators.fake,
+                realIndicators: scanData.indicators.real,
+                mode: scanData.mode || 'text',
+                date: new Date().toISOString().replace('T', ' ').substring(0, 19),
+                status: 'completed'
+            };
+            
+            allScans.push(newScan);
+            saveScans();
+            
+            // Update user stats
+            updateUserStats(currentUser.id, scanData);
+            
+            return newScan;
+        }
+        
+        function updateUserStats(userId, scanData) {
+            const userIndex = allUsers.findIndex(u => u.id === userId);
+            if (userIndex !== -1) {
+                const user = allUsers[userIndex];
+                user.scans += 1;
+                
+                if (scanData.classification === 'Real') {
+                    user.realJobs += 1;
+                } else if (scanData.classification === 'Fake') {
+                    user.fakeJobs += 1;
+                }
+                
+                // Calculate average confidence
+                const userScans = allScans.filter(s => s.userId === userId);
+                const totalConfidence = userScans.reduce((sum, scan) => sum + scan.confidence, 0);
+                user.avgConfidence = Math.round(totalConfidence / userScans.length);
+                
+                allUsers[userIndex] = user;
+                saveUsers();
+                
+                // Update current user if it's the same
+                if (currentUser && currentUser.id === userId) {
+                    currentUser = { ...user };
+                    saveCurrentUser();
+                }
+            }
+        }
+        
+        function getUserScans(userId) {
+            return allScans.filter(scan => scan.userId === userId).sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+        
+        function getAllScans() {
+            return allScans.sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+        
+        function getRecentScans(limit = 10) {
+            return getAllScans().slice(0, limit);
+        }
+        
+        function getSystemStats() {
+            const stats = {
+                totalUsers: allUsers.length,
+                totalScans: allScans.length,
+                realJobs: allScans.filter(s => s.result === 'Real').length,
+                fakeJobs: allScans.filter(s => s.result === 'Fake').length,
+                activeUsers: allUsers.filter(u => u.status === 'active').length,
+                inactiveUsers: allUsers.filter(u => u.status === 'inactive').length,
+                textScans: allScans.filter(s => s.mode === 'text').length,
+                imageScans: allScans.filter(s => s.mode === 'image').length,
+                bothScans: allScans.filter(s => s.mode === 'both').length
+            };
+            
+            // Calculate average confidence
+            if (allScans.length > 0) {
+                const totalConfidence = allScans.reduce((sum, scan) => sum + scan.confidence, 0);
+                stats.avgConfidence = Math.round(totalConfidence / allScans.length);
+            } else {
+                stats.avgConfidence = 0;
+            }
+            
+            return stats;
+        }
+        
+        function simulateNLP(jobDescription) {
+            const textLower = jobDescription.toLowerCase();
+            
+            let fakeScore = 0;
+            let realScore = 0;
+            
+            // Check for fake indicators
+            FAKE_INDICATORS.forEach(indicator => {
+                const regex = new RegExp(indicator, 'gi');
+                const matches = textLower.match(regex);
+                if (matches) {
+                    fakeScore += matches.length;
+                }
+            });
+            
+            // Check for real indicators
+            REAL_INDICATORS.forEach(indicator => {
+                const regex = new RegExp(indicator, 'gi');
+                const matches = textLower.match(regex);
+                if (matches) {
+                    realScore += matches.length;
+                }
+            });
+            
+            const totalScore = fakeScore + realScore;
+            let classification, confidence, details;
+            
+            if (totalScore === 0) {
+                classification = "Uncertain";
+                confidence = Math.floor(Math.random() * 30) + 40; // 40-70%
+                details = "Insufficient indicators detected. Manual review recommended.";
+            } else if (fakeScore > realScore) {
+                classification = "Fake";
+                confidence = Math.min(95, Math.floor((fakeScore / totalScore) * 100) + 10);
+                details = `Detected ${fakeScore} potential scam indicators. This job posting shows characteristics commonly associated with fraudulent opportunities.`;
+            } else {
+                classification = "Real";
+                confidence = Math.min(95, Math.floor((realScore / totalScore) * 100) + 10);
+                details = `Detected ${realScore} legitimate job indicators. This job posting appears to be from a genuine employer.`;
+            }
+            
+            // Check for red flags
+            const redFlags = ["send money", "upfront payment", "registration fee", "pay to start", "investment required", "western union", "money transfer"];
+            const hasRedFlag = redFlags.some(flag => textLower.includes(flag));
+            
+            if (hasRedFlag && classification !== "Fake") {
+                classification = "Fake";
+                confidence = Math.max(confidence, 85);
+                details = "Red flag detected: Request for payment or investment. " + details;
+            }
+            
+            // Extract job title from first line
+            const firstLine = jobDescription.split('\n')[0];
+            const title = firstLine.length > 50 ? firstLine.substring(0, 50) + '...' : firstLine;
+            
+            return {
+                classification,
+                confidence,
+                details,
+                indicators: { fake: fakeScore, real: realScore },
+                title: title || "User Submitted Job",
+                description: jobDescription
+            };
+        }
+        
+        // OCR function for image processing
+        async function extractTextFromImage(imageFile) {
+            return new Promise((resolve, reject) => {
+                if (!imageFile) {
+                    reject(new Error('No image file provided'));
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const image = new Image();
+                    image.onload = function() {
+                        // Create Tesseract worker
+                        Tesseract.recognize(
+                            image,
+                            'eng',
+                            {
+                                logger: (m) => {
+                                    if (m.status === 'recognizing text') {
+                                        const progress = Math.min(100, Math.round(m.progress * 100));
+                                        updateOCRProgress(progress);
+                                    }
+                                }
+                            }
+                        ).then(({ data: { text } }) => {
+                            resolve(text);
+                        }).catch(err => {
+                            reject(err);
+                        });
+                    };
+                    image.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(imageFile);
+            });
+        }
+        
+        function updateOCRProgress(percent) {
+            // Update progress for image scanner
+            const progressBar = document.getElementById('ocrProgressBar');
+            const progressPercent = document.getElementById('ocrProgressPercent');
+            
+            if (progressBar) {
+                progressBar.style.width = percent + '%';
+            }
+            
+            if (progressPercent) {
+                progressPercent.textContent = percent + '%';
+            }
+            
+            // Also update for combined scanner
+            const progressBarBoth = document.getElementById('ocrProgressBarBoth');
+            const progressPercentBoth = document.getElementById('ocrProgressPercentBoth');
+            
+            if (progressBarBoth) {
+                progressBarBoth.style.width = percent + '%';
+            }
+            
+            if (progressPercentBoth) {
+                progressPercentBoth.textContent = percent + '%';
+            }
+        }
+        
+        // ============================================
+        // CHART FUNCTIONS
+        // ============================================
+        
+        function createRealFakeChart() {
+            const stats = getSystemStats();
+            const ctx = document.getElementById('realFakeChart').getContext('2d');
+            
+            if (charts.realFakeChart) {
+                charts.realFakeChart.destroy();
+            }
+            
+            charts.realFakeChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Real Jobs', 'Fake Jobs'],
+                    datasets: [{
+                        data: [stats.realJobs, stats.fakeJobs],
+                        backgroundColor: [
+                            'rgba(74, 222, 128, 0.8)',
+                            'rgba(239, 68, 68, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(74, 222, 128, 1)',
+                            'rgba(239, 68, 68, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    size: 12
+                                },
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createUserActivityChart() {
+            const activeUsers = allUsers.filter(u => u.status === 'active').length;
+            const inactiveUsers = allUsers.filter(u => u.status === 'inactive').length;
+            const newUsers = allUsers.filter(u => {
+                const regDate = new Date(u.registrationDate);
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                return regDate > weekAgo;
+            }).length;
+            
+            const ctx = document.getElementById('userActivityChart').getContext('2d');
+            
+            if (charts.userActivityChart) {
+                charts.userActivityChart.destroy();
+            }
+            
+            charts.userActivityChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Active Users', 'Inactive Users', 'New Users (Last 7 Days)'],
+                    datasets: [{
+                        data: [activeUsers, inactiveUsers, newUsers],
+                        backgroundColor: [
+                            'rgba(67, 97, 238, 0.8)',
+                            'rgba(100, 116, 139, 0.8)',
+                            'rgba(76, 201, 240, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(67, 97, 238, 1)',
+                            'rgba(100, 116, 139, 1)',
+                            'rgba(76, 201, 240, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    size: 12
+                                },
+                                padding: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createConfidenceChart() {
+            const highConfidence = allScans.filter(s => s.confidence >= 85).length;
+            const mediumConfidence = allScans.filter(s => s.confidence >= 70 && s.confidence < 85).length;
+            const lowConfidence = allScans.filter(s => s.confidence < 70).length;
+            
+            const ctx = document.getElementById('confidenceChart').getContext('2d');
+            
+            if (charts.confidenceChart) {
+                charts.confidenceChart.destroy();
+            }
+            
+            charts.confidenceChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['High Confidence (85%+)', 'Medium Confidence (70-84%)', 'Low Confidence (<70%)'],
+                    datasets: [{
+                        data: [highConfidence, mediumConfidence, lowConfidence],
+                        backgroundColor: [
+                            'rgba(74, 222, 128, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(239, 68, 68, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(74, 222, 128, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(239, 68, 68, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    size: 12
+                                },
+                                padding: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createDailyScansChart() {
+            // Generate last 7 days data
+            const last7Days = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                last7Days.push(date.toISOString().split('T')[0]);
+            }
+            
+            // Count scans per day
+            const scansPerDay = last7Days.map(date => {
+                return allScans.filter(scan => scan.date.startsWith(date)).length;
+            });
+            
+            const ctx = document.getElementById('dailyScansChart').getContext('2d');
+            
+            if (charts.dailyScansChart) {
+                charts.dailyScansChart.destroy();
+            }
+            
+            charts.dailyScansChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: last7Days.map(date => {
+                        const d = new Date(date);
+                        return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                    }),
+                    datasets: [{
+                        label: 'Scans Per Day',
+                        data: scansPerDay,
+                        backgroundColor: 'rgba(67, 97, 238, 0.8)',
+                        borderColor: 'rgba(67, 97, 238, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateAnalyticsSummary() {
+            const stats = getSystemStats();
+            const summaryTable = document.getElementById('analyticsSummaryTable');
+            
+            // Calculate daily average scans
+            const dailyAvg = allScans.length > 0 ? (allScans.length / 30).toFixed(1) : 0;
+            
+            // Calculate fake job percentage
+            const fakePercentage = stats.totalScans > 0 ? Math.round((stats.fakeJobs / stats.totalScans) * 100) : 0;
+            
+            // Calculate user engagement (users with scans)
+            const usersWithScans = allUsers.filter(user => user.scans > 0).length;
+            const engagementRate = allUsers.length > 0 ? Math.round((usersWithScans / allUsers.length) * 100) : 0;
+            
+            summaryTable.innerHTML = `
+                <tr>
+                    <td>Total System Scans</td>
+                    <td>${stats.totalScans}</td>
+                    <td>+${Math.floor(stats.totalScans * 0.15)} this month</td>
+                    <td><span style="color: var(--success);">↑ Growing</span></td>
+                </tr>
+                <tr>
+                    <td>Fake Job Detection Rate</td>
+                    <td>${fakePercentage}%</td>
+                    <td>+${Math.floor(fakePercentage * 0.05)}% from last month</td>
+                    <td><span style="color: var(--success);">↑ Improving</span></td>
+                </tr>
+                <tr>
+                    <td>Average Daily Scans</td>
+                    <td>${dailyAvg}</td>
+                    <td>+${(dailyAvg * 0.1).toFixed(1)} from last month</td>
+                    <td><span style="color: var(--success);">↑ Increasing</span></td>
+                </tr>
+                <tr>
+                    <td>User Engagement Rate</td>
+                    <td>${engagementRate}%</td>
+                    <td>+${Math.floor(engagementRate * 0.08)}% from last month</td>
+                    <td><span style="color: var(--success);">↑ Improving</span></td>
+                </tr>
+                <tr>
+                    <td>Average Confidence Score</td>
+                    <td>${stats.avgConfidence}%</td>
+                    <td>+${Math.floor(stats.avgConfidence * 0.03)}% from last month</td>
+                    <td><span style="color: var(--success);">↑ Stable</span></td>
+                </tr>
+                <tr>
+                    <td>Scan Mode Distribution</td>
+                    <td>Text: ${stats.textScans}, Image: ${stats.imageScans}, Both: ${stats.bothScans}</td>
+                    <td>+${Math.floor((stats.textScans + stats.imageScans + stats.bothScans) * 0.12)} total</td>
+                    <td><span style="color: var(--success);">↑ Balanced</span></td>
+                </tr>
+            `;
+        }
+        
+        // ============================================
+        // UI RENDERING FUNCTIONS
+        // ============================================
+        
+        function showElement(element) {
+            element.classList.remove('hidden');
+        }
+        
+        function hideElement(element) {
+            element.classList.add('hidden');
+        }
+        
+        function setActiveNav(buttons, activeButton) {
+            buttons.forEach(btn => btn.classList.remove('active'));
+            activeButton.classList.add('active');
+        }
+        
+        function updateCharCount(textareaId, countElementId) {
+            const textarea = document.getElementById(textareaId);
+            const countElement = document.getElementById(countElementId);
+            if (textarea && countElement) {
+                const count = textarea.value.length;
+                countElement.textContent = `${count} characters`;
+            }
+        }
+        
+        function showScanResult(result, resultElementId, mode) {
+            const scanResult = document.getElementById(resultElementId);
+            if (!scanResult) return;
+            
+            scanResult.innerHTML = '';
+            scanResult.className = `result-card ${result.classification.toLowerCase()}`;
+            
+            const resultIcon = result.classification === 'Real' ? 'fa-check-circle' : 
+                              result.classification === 'Fake' ? 'fa-exclamation-triangle' : 'fa-question-circle';
+            
+            const resultHTML = `
+                <div class="result-header">
+                    <h3>
+                        <i class="fas ${resultIcon}"></i>
+                        Job Classified as: <span class="result-class">${result.classification}</span>
+                    </h3>
+                    <div class="confidence-badge">${result.confidence}% Confidence</div>
+                </div>
+                
+                <div class="result-details">
+                    <p><strong>Analysis Details:</strong> ${result.details}</p>
+                    
+                    <div class="indicators">
+                        <div class="indicator fake-indicators">
+                            <span class="indicator-label">Fake Indicators Detected:</span>
+                            <span class="indicator-value">${result.indicators.fake}</span>
+                        </div>
+                        <div class="indicator real-indicators">
+                            <span class="indicator-label">Real Indicators Detected:</span>
+                            <span class="indicator-value">${result.indicators.real}</span>
+                        </div>
+                    </div>
+                    
+                    ${result.classification === 'Fake' ? `
+                        <div class="warning-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div>
+                                <strong>Warning:</strong> Be cautious of job postings that ask for upfront payments or promise unusually high earnings for minimal work.
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <p><strong>Scan Mode:</strong> ${mode === 'text' ? 'Text Only' : mode === 'image' ? 'Image Only' : 'Text + Image'}</p>
+                </div>
+            `;
+            
+            scanResult.innerHTML = resultHTML;
+            showElement(scanResult);
+        }
+        
+        function renderUserHistory() {
+            userScans = getUserScans(currentUser.id);
+            const tableBody = document.getElementById('userHistoryTableBody');
+            tableBody.innerHTML = '';
+            
+            if (userScans.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: var(--gray);">
+                            <i class="fas fa-history" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                            <p>No scan history yet. Scan your first job description to get started!</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            userScans.forEach(scan => {
+                const row = document.createElement('tr');
+                
+                // Determine confidence class
+                let confidenceClass = 'medium';
+                if (scan.confidence >= 85) confidenceClass = 'high';
+                if (scan.confidence < 70) confidenceClass = 'low';
+                
+                // Mode display
+                const modeDisplay = scan.mode === 'text' ? 'Text' : 
+                                   scan.mode === 'image' ? 'Image' : 'Text+Image';
+                
+                row.innerHTML = `
+                    <td>${scan.jobTitle}</td>
+                    <td>${modeDisplay}</td>
+                    <td>${scan.date}</td>
+                    <td><span class="status-badge ${scan.result === 'Real' ? 'active' : 'inactive'}">${scan.result}</span></td>
+                    <td class="confidence-cell ${confidenceClass}">${scan.confidence}%</td>
+                    <td>
+                        <button class="clear-btn view-scan-btn" data-id="${scan.id}" title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Add event listeners to view buttons
+            document.querySelectorAll('.view-scan-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const scanId = parseInt(this.getAttribute('data-id'));
+                    const scan = userScans.find(s => s.id === scanId);
+                    if (scan) {
+                        alert(`Job Title: ${scan.jobTitle}\n\nMode: ${scan.mode}\nResult: ${scan.result}\nConfidence: ${scan.confidence}%\nDate: ${scan.date}\n\nFake Indicators: ${scan.fakeIndicators}\nReal Indicators: ${scan.realIndicators}`);
+                    }
+                });
+            });
+        }
+        
+        function renderAdminRecentScans() {
+            const recentScans = getRecentScans(5);
+            const tableBody = document.getElementById('adminRecentScansTableBody');
+            tableBody.innerHTML = '';
+            
+            recentScans.forEach(scan => {
+                const row = document.createElement('tr');
+                
+                // Determine confidence class
+                let confidenceClass = 'medium';
+                if (scan.confidence >= 85) confidenceClass = 'high';
+                if (scan.confidence < 70) confidenceClass = 'low';
+                
+                // Mode display
+                const modeDisplay = scan.mode === 'text' ? 'Text' : 
+                                   scan.mode === 'image' ? 'Image' : 'Text+Image';
+                
+                row.innerHTML = `
+                    <td>${scan.userName}</td>
+                    <td>${scan.jobTitle}</td>
+                    <td>${modeDisplay}</td>
+                    <td>${scan.date}</td>
+                    <td><span class="status-badge ${scan.result === 'Real' ? 'active' : 'inactive'}">${scan.result}</span></td>
+                    <td class="confidence-cell ${confidenceClass}">${scan.confidence}%</td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function renderAdminAllScans() {
+            const allScansData = getAllScans();
+            const tableBody = document.getElementById('adminAllScansTableBody');
+            tableBody.innerHTML = '';
+            
+            allScansData.forEach(scan => {
+                const row = document.createElement('tr');
+                
+                // Determine confidence class
+                let confidenceClass = 'medium';
+                if (scan.confidence >= 85) confidenceClass = 'high';
+                if (scan.confidence < 70) confidenceClass = 'low';
+                
+                // Mode display
+                const modeDisplay = scan.mode === 'text' ? 'Text' : 
+                                   scan.mode === 'image' ? 'Image' : 'Text+Image';
+                
+                row.innerHTML = `
+                    <td>${scan.id}</td>
+                    <td>${scan.userName}</td>
+                    <td>${scan.jobTitle}</td>
+                    <td>${modeDisplay}</td>
+                    <td>${scan.date}</td>
+                    <td><span class="status-badge ${scan.result === 'Real' ? 'active' : 'inactive'}">${scan.result}</span></td>
+                    <td class="confidence-cell ${confidenceClass}">${scan.confidence}%</td>
+                    <td>
+                        <button class="clear-btn view-scan-btn" data-id="${scan.id}" title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="clear-btn delete-scan-btn" data-id="${scan.id}" title="Delete Scan" style="color: var(--danger); margin-left: 5px;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Add event listeners
+            document.querySelectorAll('.view-scan-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const scanId = parseInt(this.getAttribute('data-id'));
+                    const scan = allScans.find(s => s.id === scanId);
+                    if (scan) {
+                        alert(`Scan ID: ${scan.id}\nUser: ${scan.userName} (${scan.userEmail})\nJob Title: ${scan.jobTitle}\nMode: ${scan.mode}\nResult: ${scan.result}\nConfidence: ${scan.confidence}%\nDate: ${scan.date}\n\nFake Indicators: ${scan.fakeIndicators}\nReal Indicators: ${scan.realIndicators}`);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.delete-scan-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const scanId = parseInt(this.getAttribute('data-id'));
+                    if (confirm('Are you sure you want to delete this scan?')) {
+                        const scanIndex = allScans.findIndex(s => s.id === scanId);
+                        if (scanIndex !== -1) {
+                            allScans.splice(scanIndex, 1);
+                            saveScans();
+                            renderAdminAllScans();
+                            renderAdminRecentScans();
+                            updateAdminStats();
+                            createCharts();
+                            updateAnalyticsSummary();
+                            showSuccessMessage('Scan deleted successfully!');
+                        }
+                    }
+                });
+            });
+        }
+        
+        function renderAdminUsers() {
+            const tableBody = document.getElementById('adminUsersTableBody');
+            tableBody.innerHTML = '';
+            
+            allUsers.forEach(user => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${user.username}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.scans}</td>
+                    <td>${new Date(user.lastLogin).toLocaleString()}</td>
+                    <td><span class="status-badge ${user.status}">${user.status.toUpperCase()}</span></td>
+                    <td>
+                        <button class="clear-btn toggle-user-btn" data-id="${user.id}" data-status="${user.status}" title="${user.status === 'active' ? 'Deactivate' : 'Activate'}">
+                            <i class="fas fa-${user.status === 'active' ? 'user-slash' : 'user-check'}"></i>
+                        </button>
+                        <button class="clear-btn delete-user-btn" data-id="${user.id}" title="Delete User" style="color: var(--danger); margin-left: 5px;" ${user.role === 'admin' ? 'disabled' : ''}>
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Add event listeners
+            document.querySelectorAll('.toggle-user-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = parseInt(this.getAttribute('data-id'));
+                    const currentStatus = this.getAttribute('data-status');
+                    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+                    
+                    const userIndex = allUsers.findIndex(u => u.id === userId);
+                    if (userIndex !== -1) {
+                        allUsers[userIndex].status = newStatus;
+                        saveUsers();
+                        renderAdminUsers();
+                        updateAdminStats();
+                        showSuccessMessage(`User ${newStatus === 'active' ? 'activated' : 'deactivated'} successfully!`);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.delete-user-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (this.disabled) return;
+                    
+                    const userId = parseInt(this.getAttribute('data-id'));
+                    const user = allUsers.find(u => u.id === userId);
+                    
+                    if (user && user.role !== 'admin') {
+                        if (confirm(`Are you sure you want to delete user ${user.name}? This will also delete all their scans.`)) {
+                            // Delete user's scans first
+                            const userScans = allScans.filter(s => s.userId === userId);
+                            userScans.forEach(scan => {
+                                const scanIndex = allScans.findIndex(s => s.id === scan.id);
+                                if (scanIndex !== -1) {
+                                    allScans.splice(scanIndex, 1);
+                                }
+                            });
+                            
+                            // Delete user
+                            const userIndex = allUsers.findIndex(u => u.id === userId);
+                            if (userIndex !== -1) {
+                                allUsers.splice(userIndex, 1);
+                                saveUsers();
+                                saveScans();
+                                renderAdminUsers();
+                                renderAdminAllScans();
+                                renderAdminRecentScans();
+                                updateAdminStats();
+                                createCharts();
+                                updateAnalyticsSummary();
+                                showSuccessMessage('User deleted successfully!');
+                            }
+                        }
+                    }
+                });
+            });
+        }
+        
+        function updateUserStatsDisplay() {
+            if (!currentUser) return;
+            
+            userScans = getUserScans(currentUser.id);
+            const stats = getSystemStats();
+            
+            // Update user dashboard stats
+            userTotalScans.textContent = currentUser.scans || 0;
+            userAvgAccuracy.textContent = currentUser.avgConfidence ? currentUser.avgConfidence + '%' : '0%';
+            
+            // Update dashboard page stats
+            dashboardTotalScans.textContent = currentUser.scans || 0;
+            dashboardRealJobs.textContent = currentUser.realJobs || 0;
+            dashboardFakeJobs.textContent = currentUser.fakeJobs || 0;
+            dashboardAvgConfidence.textContent = currentUser.avgConfidence ? currentUser.avgConfidence + '%' : '0%';
+            
+            // Update history page stats
+            historyTotalScans.textContent = currentUser.scans || 0;
+            historyRealJobs.textContent = currentUser.realJobs || 0;
+            historyFakeJobs.textContent = currentUser.fakeJobs || 0;
+            historyAvgConfidence.textContent = currentUser.avgConfidence ? currentUser.avgConfidence + '%' : '0%';
+            
+            // Update profile page
+            profileAvatar.textContent = currentUser.name.charAt(0);
+            profileName.textContent = currentUser.name;
+            profileEmail.textContent = currentUser.email;
+            profileUsername.textContent = '@' + currentUser.username;
+            profileMemberSince.textContent = 'Member since: ' + currentUser.memberSince;
+            profileUserId.textContent = 'U' + currentUser.id.toString().padStart(3, '0');
+            profileLastLogin.textContent = new Date(currentUser.lastLogin).toLocaleString();
+            profileStatus.textContent = currentUser.status.charAt(0).toUpperCase() + currentUser.status.slice(1);
+            profileRegDate.textContent = currentUser.registrationDate || '2026-01-01';
+            profileTotalScans.textContent = currentUser.scans || 0;
+            profileRealJobs.textContent = currentUser.realJobs || 0;
+            profileFakeJobs.textContent = currentUser.fakeJobs || 0;
+            profileAvgConfidence.textContent = currentUser.avgConfidence ? currentUser.avgConfidence + '%' : '0%';
+            profileLastScan.textContent = userScans.length > 0 ? userScans[0].date : 'Never';
+        }
+        
+        function updateAdminStats() {
+            const stats = getSystemStats();
+            
+            // Update admin dashboard stats
+            adminStatsUsers.textContent = stats.totalUsers;
+            adminStatsScans.textContent = stats.totalScans;
+            adminStatsReal.textContent = stats.realJobs;
+            adminStatsFake.textContent = stats.fakeJobs;
+            
+            adminTotalUsers.textContent = stats.totalUsers;
+            adminTotalScans.textContent = stats.totalScans;
+        }
+        
+        function createCharts() {
+            createRealFakeChart();
+            createUserActivityChart();
+            createConfidenceChart();
+            createDailyScansChart();
+            updateAnalyticsSummary();
+        }
+        
+        function showSuccessMessage(message) {
+            // For admin dashboard
+            const adminPage = document.getElementById('adminPageTitle');
+            if (adminPage && adminPage.textContent.includes('Dashboard')) {
+                alert(message); // In a real app, you'd use a toast notification
+            }
+        }
+        
+        function loadUserSettings() {
+            // Load settings from local storage
+            const storedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+            if (storedSettings) {
+                userSettings = JSON.parse(storedSettings);
+            }
+            
+            // Update UI elements
+            document.getElementById('privacyDataSharing').checked = userSettings.privacyDataSharing;
+            document.getElementById('privacyJobHistory').checked = userSettings.privacyJobHistory;
+            document.getElementById('privacyAnalytics').checked = userSettings.privacyAnalytics;
+            document.getElementById('notifJobResults').checked = userSettings.notifJobResults;
+            document.getElementById('notifHighRisk').checked = userSettings.notifHighRisk;
+            document.getElementById('notifAccountSecurity').checked = userSettings.notifAccountSecurity;
+        }
+        
+        function saveUserSettings() {
+            // Update settings object
+            userSettings.privacyDataSharing = document.getElementById('privacyDataSharing').checked;
+            userSettings.privacyJobHistory = document.getElementById('privacyJobHistory').checked;
+            userSettings.privacyAnalytics = document.getElementById('privacyAnalytics').checked;
+            userSettings.notifJobResults = document.getElementById('notifJobResults').checked;
+            userSettings.notifHighRisk = document.getElementById('notifHighRisk').checked;
+            userSettings.notifAccountSecurity = document.getElementById('notifAccountSecurity').checked;
+            
+            // Save to local storage
+            saveSettings();
+            
+            // Show confirmation
+            alert('Settings saved successfully!');
+        }
+        
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        
+        function initializeUserDashboard() {
+            // Set user information
+            userAvatar.textContent = currentUser.name.charAt(0);
+            userName.textContent = currentUser.name;
+            userUsername.textContent = '@' + currentUser.username;
+            
+            // Load user settings
+            loadUserSettings();
+            
+            // Update stats and render history
+            updateUserStatsDisplay();
+            renderUserHistory();
+            
+            // Show dashboard page by default
+            setActiveNav([userDashboardBtn, userScannerBtn, userHistoryBtn, userProfileBtn, userSettingsBtn], userDashboardBtn);
+            userPageTitle.textContent = 'Dashboard';
+            showElement(userDashboardPage);
+            hideElement(userScannerPageText);
+            hideElement(userScannerPageImage);
+            hideElement(userScannerPageBoth);
+            hideElement(userHistoryPage);
+            hideElement(userProfilePage);
+            hideElement(userSettingsPage);
+            
+            // Show dashboard
+            hideElement(authPage);
+            showElement(userDashboard);
+        }
+        
+        function initializeAdminDashboard() {
+            // Update admin stats
+            updateAdminStats();
+            
+            // Render tables
+            renderAdminRecentScans();
+            renderAdminAllScans();
+            renderAdminUsers();
+            
+            // Create charts
+            createCharts();
+            
+            // Show overview page by default
+            setActiveNav([adminOverviewBtn, adminScansBtn, adminUsersBtn, adminAnalyticsBtn], adminOverviewBtn);
+            adminPageTitle.textContent = 'Admin Dashboard';
+            showElement(adminOverviewPage);
+            hideElement(adminScansPage);
+            hideElement(adminUsersPage);
+            hideElement(adminAnalyticsPage);
+            
+            // Show dashboard
+            hideElement(authPage);
+            showElement(adminDashboard);
+        }
+        
+        // ============================================
+        // DOM ELEMENTS
+        // ============================================
+        
+        // Auth page elements
+        const authPage = document.getElementById('authPage');
+        const loginTabBtn = document.getElementById('loginTabBtn');
+        const registerTabBtn = document.getElementById('registerTabBtn');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginEmail = document.getElementById('loginEmail');
+        const loginPassword = document.getElementById('loginPassword');
+        const loginError = document.getElementById('loginError');
+        const loginSuccess = document.getElementById('loginSuccess');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerName = document.getElementById('registerName');
+        const registerEmail = document.getElementById('registerEmail');
+        const registerUsername = document.getElementById('registerUsername');
+        const registerPassword = document.getElementById('registerPassword');
+        const registerConfirmPassword = document.getElementById('registerConfirmPassword');
+        const registerRole = document.getElementById('registerRole');
+        const adminCodeGroup = document.getElementById('adminCodeGroup');
+        const adminCode = document.getElementById('adminCode');
+        const registerError = document.getElementById('registerError');
+        const registerSuccess = document.getElementById('registerSuccess');
+        const registerBtn = document.getElementById('registerBtn');
+        const switchToLogin = document.getElementById('switchToLogin');
+        
+        // User dashboard elements
+        const userDashboard = document.getElementById('userDashboard');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
+        const userUsername = document.getElementById('userUsername');
+        const userTotalScans = document.getElementById('userTotalScans');
+        const userAvgAccuracy = document.getElementById('userAvgAccuracy');
+        const userDashboardBtn = document.getElementById('userDashboardBtn');
+        const userScannerBtn = document.getElementById('userScannerBtn');
+        const userHistoryBtn = document.getElementById('userHistoryBtn');
+        const userProfileBtn = document.getElementById('userProfileBtn');
+        const userSettingsBtn = document.getElementById('userSettingsBtn');
+        const userLogoutBtn = document.getElementById('userLogoutBtn');
+        const userPageTitle = document.getElementById('userPageTitle');
+        const userDashboardPage = document.getElementById('userDashboardPage');
+        const userScannerPageText = document.getElementById('userScannerPageText');
+        const userScannerPageImage = document.getElementById('userScannerPageImage');
+        const userScannerPageBoth = document.getElementById('userScannerPageBoth');
+        const userHistoryPage = document.getElementById('userHistoryPage');
+        const userProfilePage = document.getElementById('userProfilePage');
+        const userSettingsPage = document.getElementById('userSettingsPage');
+        const userSearchInput = document.getElementById('userSearchInput');
+        
+        // User dashboard stats
+        const dashboardTotalScans = document.getElementById('dashboardTotalScans');
+        const dashboardRealJobs = document.getElementById('dashboardRealJobs');
+        const dashboardFakeJobs = document.getElementById('dashboardFakeJobs');
+        const dashboardAvgConfidence = document.getElementById('dashboardAvgConfidence');
+        
+        // User scanner elements - Text mode
+        const realSampleBtnText = document.getElementById('realSampleBtnText');
+        const fakeSampleBtnText = document.getElementById('fakeSampleBtnText');
+        const jobTextareaText = document.getElementById('jobTextareaText');
+        const charCountText = document.getElementById('charCountText');
+        const clearTextBtnText = document.getElementById('clearTextBtnText');
+        const scanErrorText = document.getElementById('scanErrorText');
+        const scanJobBtnText = document.getElementById('scanJobBtnText');
+        const scanResultText = document.getElementById('scanResultText');
+        
+        // User scanner elements - Image mode
+        const uploadAreaImage = document.getElementById('uploadAreaImage');
+        const imageUploadInput = document.getElementById('imageUploadInput');
+        const imagePreviewImage = document.getElementById('imagePreviewImage');
+        const previewImage = document.getElementById('previewImage');
+        const ocrStatusImage = document.getElementById('ocrStatusImage');
+        const ocrStatusText = document.getElementById('ocrStatusText');
+        const extractedTextContainerImage = document.getElementById('extractedTextContainerImage');
+        const extractedTextImage = document.getElementById('extractedTextImage');
+        const scanErrorImage = document.getElementById('scanErrorImage');
+        const scanJobBtnImage = document.getElementById('scanJobBtnImage');
+        const scanResultImage = document.getElementById('scanResultImage');
+        
+        // User scanner elements - Both mode
+        const jobTextareaBoth = document.getElementById('jobTextareaBoth');
+        const charCountBoth = document.getElementById('charCountBoth');
+        const clearTextBtnBoth = document.getElementById('clearTextBtnBoth');
+        const uploadAreaBoth = document.getElementById('uploadAreaBoth');
+        const imageUploadInputBoth = document.getElementById('imageUploadInputBoth');
+        const imagePreviewBoth = document.getElementById('imagePreviewBoth');
+        const previewImageBoth = document.getElementById('previewImageBoth');
+        const ocrStatusBoth = document.getElementById('ocrStatusBoth');
+        const scanErrorBoth = document.getElementById('scanErrorBoth');
+        const scanJobBtnBoth = document.getElementById('scanJobBtnBoth');
+        const scanResultBoth = document.getElementById('scanResultBoth');
+        
+        // Mode selector buttons
+        const selectModeButtons = document.querySelectorAll('.select-mode-btn');
+        
+        // User history elements
+        const historyTotalScans = document.getElementById('historyTotalScans');
+        const historyRealJobs = document.getElementById('historyRealJobs');
+        const historyFakeJobs = document.getElementById('historyFakeJobs');
+        const historyAvgConfidence = document.getElementById('historyAvgConfidence');
+        
+        // User profile elements
+        const profileAvatar = document.getElementById('profileAvatar');
+        const profileName = document.getElementById('profileName');
+        const profileEmail = document.getElementById('profileEmail');
+        const profileUsername = document.getElementById('profileUsername');
+        const profileMemberSince = document.getElementById('profileMemberSince');
+        const profileTotalScans = document.getElementById('profileTotalScans');
+        const profileRealJobs = document.getElementById('profileRealJobs');
+        const profileFakeJobs = document.getElementById('profileFakeJobs');
+        const profileAvgConfidence = document.getElementById('profileAvgConfidence');
+        const profileUserId = document.getElementById('profileUserId');
+        const profileLastLogin = document.getElementById('profileLastLogin');
+        const profileStatus = document.getElementById('profileStatus');
+        const profileRegDate = document.getElementById('profileRegDate');
+        const profileLastScan = document.getElementById('profileLastScan');
+        
+        // User settings elements
+        const privacyPolicyLink = document.getElementById('privacyPolicyLink');
+        const resetNotifications = document.getElementById('resetNotifications');
+        const deleteConfirmInput = document.getElementById('deleteConfirmInput');
+        const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+        const deleteStatus = document.getElementById('deleteStatus');
+        
+        // Admin dashboard elements
+        const adminDashboard = document.getElementById('adminDashboard');
+        const adminTotalUsers = document.getElementById('adminTotalUsers');
+        const adminTotalScans = document.getElementById('adminTotalScans');
+        const adminOverviewBtn = document.getElementById('adminOverviewBtn');
+        const adminScansBtn = document.getElementById('adminScansBtn');
+        const adminUsersBtn = document.getElementById('adminUsersBtn');
+        const adminAnalyticsBtn = document.getElementById('adminAnalyticsBtn');
+        const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+        const adminPageTitle = document.getElementById('adminPageTitle');
+        const adminOverviewPage = document.getElementById('adminOverviewPage');
+        const adminScansPage = document.getElementById('adminScansPage');
+        const adminUsersPage = document.getElementById('adminUsersPage');
+        const adminAnalyticsPage = document.getElementById('adminAnalyticsPage');
+        const adminSearchInput = document.getElementById('adminSearchInput');
+        
+        // Admin stats elements
+        const adminStatsUsers = document.getElementById('adminStatsUsers');
+        const adminStatsScans = document.getElementById('adminStatsScans');
+        const adminStatsReal = document.getElementById('adminStatsReal');
+        const adminStatsFake = document.getElementById('adminStatsFake');
+        
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        
+        // Auth tabs
+        loginTabBtn.addEventListener('click', () => {
+            loginTabBtn.classList.add('active');
+            registerTabBtn.classList.remove('active');
+            showElement(loginForm);
+            hideElement(registerForm);
+            loginError.textContent = '';
+            loginSuccess.textContent = '';
+            hideElement(loginError);
+            hideElement(loginSuccess);
+        });
+        
+        registerTabBtn.addEventListener('click', () => {
+            registerTabBtn.classList.add('active');
+            loginTabBtn.classList.remove('active');
+            hideElement(loginForm);
+            showElement(registerForm);
+            registerError.textContent = '';
+            registerSuccess.textContent = '';
+            hideElement(registerError);
+            hideElement(registerSuccess);
+        });
+        
+        switchToLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginTabBtn.click();
+        });
+        
+        // Admin code visibility
+        registerRole.addEventListener('change', () => {
+            if (registerRole.value === 'admin') {
+                showElement(adminCodeGroup);
+            } else {
+                hideElement(adminCodeGroup);
+            }
+        });
+        
+        // Login
+        loginBtn.addEventListener('click', () => {
+            const email = loginEmail.value.trim();
+            const password = loginPassword.value.trim();
+            
+            if (!email || !password) {
+                loginError.textContent = 'Please fill in all fields.';
+                showElement(loginError);
+                hideElement(loginSuccess);
+                return;
+            }
+            
+            const result = loginUser(email, password);
+            
+            if (result.success) {
+                currentUser = result.user;
+                hideElement(loginError);
+                loginSuccess.textContent = 'Login successful! Redirecting...';
+                showElement(loginSuccess);
+                
+                // Redirect based on role
+                setTimeout(() => {
+                    if (currentUser.role === 'admin') {
+                        initializeAdminDashboard();
+                    } else {
+                        initializeUserDashboard();
+                    }
+                }, 1000);
+            } else {
+                loginError.textContent = result.message;
+                showElement(loginError);
+                hideElement(loginSuccess);
+            }
+        });
+        
+        // Register
+        registerBtn.addEventListener('click', () => {
+            const name = registerName.value.trim();
+            const email = registerEmail.value.trim();
+            const username = registerUsername.value.trim();
+            const password = registerPassword.value.trim();
+            const confirmPassword = registerConfirmPassword.value.trim();
+            const role = registerRole.value;
+            const code = adminCode.value.trim();
+            
+            // Validation
+            if (!name || !email || !username || !password || !confirmPassword) {
+                registerError.textContent = 'Please fill in all required fields.';
+                showElement(registerError);
+                hideElement(registerSuccess);
+                return;
+            }
+            
+            if (password.length < 6) {
+                registerError.textContent = 'Password must be at least 6 characters long.';
+                showElement(registerError);
+                hideElement(registerSuccess);
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                registerError.textContent = 'Passwords do not match.';
+                showElement(registerError);
+                hideElement(registerSuccess);
+                return;
+            }
+            
+            // Check if email already exists
+            if (allUsers.some(u => u.email === email)) {
+                registerError.textContent = 'Email already registered. Please use a different email or login.';
+                showElement(registerError);
+                hideElement(registerSuccess);
+                return;
+            }
+            
+            // Check if username already exists
+            if (allUsers.some(u => u.username === username)) {
+                registerError.textContent = 'Username already taken. Please choose a different username.';
+                showElement(registerError);
+                hideElement(registerSuccess);
+                return;
+            }
+            
+            // Admin registration requires code
+            if (role === 'admin') {
+                if (code !== 'ADMIN2026') {
+                    registerError.textContent = 'Invalid admin access code.';
+                    showElement(registerError);
+                    hideElement(registerSuccess);
+                    return;
+                }
+            }
+            
+            // Register user
+            const userData = {
+                name,
+                email,
+                username,
+                password,
+                role
+            };
+            
+            const newUser = registerUser(userData);
+            currentUser = newUser;
+            
+            registerSuccess.textContent = 'Registration successful! You are now logged in.';
+            showElement(registerSuccess);
+            hideElement(registerError);
+            
+            // Clear form
+            registerName.value = '';
+            registerEmail.value = '';
+            registerUsername.value = '';
+            registerPassword.value = '';
+            registerConfirmPassword.value = '';
+            adminCode.value = '';
+            
+            // Redirect based on role
+            setTimeout(() => {
+                if (role === 'admin') {
+                    initializeAdminDashboard();
+                } else {
+                    initializeUserDashboard();
+                }
+            }, 1500);
+        });
+        
+        // User navigation
+        userDashboardBtn.addEventListener('click', () => {
+            setActiveNav([userDashboardBtn, userScannerBtn, userHistoryBtn, userProfileBtn, userSettingsBtn], userDashboardBtn);
+            userPageTitle.textContent = 'Dashboard';
+            showElement(userDashboardPage);
+            hideElement(userScannerPageText);
+            hideElement(userScannerPageImage);
+            hideElement(userScannerPageBoth);
+            hideElement(userHistoryPage);
+            hideElement(userProfilePage);
+            hideElement(userSettingsPage);
+        });
+        
+        userScannerBtn.addEventListener('click', () => {
+            setActiveNav([userDashboardBtn, userScannerBtn, userHistoryBtn, userProfileBtn, userSettingsBtn], userScannerBtn);
+            userPageTitle.textContent = 'Job Scanner';
+            showElement(userDashboardPage); // Show mode selector
+            hideElement(userScannerPageText);
+            hideElement(userScannerPageImage);
+            hideElement(userScannerPageBoth);
+            hideElement(userHistoryPage);
+            hideElement(userProfilePage);
+            hideElement(userSettingsPage);
+        });
+        
+        userHistoryBtn.addEventListener('click', () => {
+            setActiveNav([userDashboardBtn, userScannerBtn, userHistoryBtn, userProfileBtn, userSettingsBtn], userHistoryBtn);
+            userPageTitle.textContent = 'Scan History';
+            hideElement(userDashboardPage);
+            hideElement(userScannerPageText);
+            hideElement(userScannerPageImage);
+            hideElement(userScannerPageBoth);
+            showElement(userHistoryPage);
+            hideElement(userProfilePage);
+            hideElement(userSettingsPage);
+            renderUserHistory();
+        });
+        
+        userProfileBtn.addEventListener('click', () => {
+            setActiveNav([userDashboardBtn, userScannerBtn, userHistoryBtn, userProfileBtn, userSettingsBtn], userProfileBtn);
+            userPageTitle.textContent = 'My Profile';
+            hideElement(userDashboardPage);
+            hideElement(userScannerPageText);
+            hideElement(userScannerPageImage);
+            hideElement(userScannerPageBoth);
+            hideElement(userHistoryPage);
+            showElement(userProfilePage);
+            hideElement(userSettingsPage);
+        });
+        
+        userSettingsBtn.addEventListener('click', () => {
+            setActiveNav([userDashboardBtn, userScannerBtn, userHistoryBtn, userProfileBtn, userSettingsBtn], userSettingsBtn);
+            userPageTitle.textContent = 'Settings';
+            hideElement(userDashboardPage);
+            hideElement(userScannerPageText);
+            hideElement(userScannerPageImage);
+            hideElement(userScannerPageBoth);
+            hideElement(userHistoryPage);
+            hideElement(userProfilePage);
+            showElement(userSettingsPage);
+        });
+        
+        // Mode selection
+        selectModeButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const mode = this.getAttribute('data-mode');
+                currentScannerMode = mode;
+                
+                // Show the appropriate scanner page
+                hideElement(userDashboardPage);
+                
+                if (mode === 'text') {
+                    showElement(userScannerPageText);
+                    hideElement(userScannerPageImage);
+                    hideElement(userScannerPageBoth);
+                    userPageTitle.textContent = 'Text Scanner';
+                } else if (mode === 'image') {
+                    hideElement(userScannerPageText);
+                    showElement(userScannerPageImage);
+                    hideElement(userScannerPageBoth);
+                    userPageTitle.textContent = 'Image Scanner';
+                } else if (mode === 'both') {
+                    hideElement(userScannerPageText);
+                    hideElement(userScannerPageImage);
+                    showElement(userScannerPageBoth);
+                    userPageTitle.textContent = 'Combined Scanner';
+                }
+            });
+        });
+        
+        // Back to dashboard buttons
+        document.querySelectorAll('.back-to-dashboard').forEach(btn => {
+            btn.addEventListener('click', () => {
+                userDashboardBtn.click();
+            });
+        });
+        
+        // Admin navigation
+        adminOverviewBtn.addEventListener('click', () => {
+            setActiveNav([adminOverviewBtn, adminScansBtn, adminUsersBtn, adminAnalyticsBtn], adminOverviewBtn);
+            adminPageTitle.textContent = 'Admin Dashboard';
+            showElement(adminOverviewPage);
+            hideElement(adminScansPage);
+            hideElement(adminUsersPage);
+            hideElement(adminAnalyticsPage);
+        });
+        
+        adminScansBtn.addEventListener('click', () => {
+            setActiveNav([adminOverviewBtn, adminScansBtn, adminUsersBtn, adminAnalyticsBtn], adminScansBtn);
+            adminPageTitle.textContent = 'All Scans';
+            hideElement(adminOverviewPage);
+            showElement(adminScansPage);
+            hideElement(adminUsersPage);
+            hideElement(adminAnalyticsPage);
+            renderAdminAllScans();
+        });
+        
+        adminUsersBtn.addEventListener('click', () => {
+            setActiveNav([adminOverviewBtn, adminScansBtn, adminUsersBtn, adminAnalyticsBtn], adminUsersBtn);
+            adminPageTitle.textContent = 'User Management';
+            hideElement(adminOverviewPage);
+            hideElement(adminScansPage);
+            showElement(adminUsersPage);
+            hideElement(adminAnalyticsPage);
+            renderAdminUsers();
+        });
+        
+        adminAnalyticsBtn.addEventListener('click', () => {
+            setActiveNav([adminOverviewBtn, adminScansBtn, adminUsersBtn, adminAnalyticsBtn], adminAnalyticsBtn);
+            adminPageTitle.textContent = 'Analytics';
+            hideElement(adminOverviewPage);
+            hideElement(adminScansPage);
+            hideElement(adminUsersPage);
+            showElement(adminAnalyticsPage);
+            createCharts();
+        });
+        
+        // User scanner functionality - Text mode
+        realSampleBtnText.addEventListener('click', () => {
+            jobTextareaText.value = SAMPLE_JOBS.real;
+            updateCharCount('jobTextareaText', 'charCountText');
+            hideElement(scanErrorText);
+            hideElement(scanResultText);
+        });
+        
+        fakeSampleBtnText.addEventListener('click', () => {
+            jobTextareaText.value = SAMPLE_JOBS.fake;
+            updateCharCount('jobTextareaText', 'charCountText');
+            hideElement(scanErrorText);
+            hideElement(scanResultText);
+        });
+        
+        jobTextareaText.addEventListener('input', () => updateCharCount('jobTextareaText', 'charCountText'));
+        
+        clearTextBtnText.addEventListener('click', () => {
+            jobTextareaText.value = '';
+            updateCharCount('jobTextareaText', 'charCountText');
+            hideElement(scanErrorText);
+            hideElement(scanResultText);
+        });
+        
+        scanJobBtnText.addEventListener('click', () => {
+            const jobText = jobTextareaText.value.trim();
+            
+            if (!jobText) {
+                scanErrorText.textContent = 'Please enter a job description to scan.';
+                showElement(scanErrorText);
+                return;
+            }
+            
+            if (jobText.length < 50) {
+                scanErrorText.textContent = 'Please enter a more detailed job description (at least 50 characters).';
+                showElement(scanErrorText);
+                return;
+            }
+            
+            // Disable button and show loading
+            scanJobBtnText.disabled = true;
+            scanJobBtnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+            hideElement(scanErrorText);
+            hideElement(scanResultText);
+            
+            // Simulate API call with timeout
+            setTimeout(() => {
+                const result = simulateNLP(jobText);
+                result.mode = 'text';
+                showScanResult(result, 'scanResultText', 'text');
+                
+                // Save scan to database
+                const newScan = addNewScan(result);
+                
+                // Update UI
+                updateUserStatsDisplay();
+                renderUserHistory();
+                
+                // Update admin stats if admin is viewing
+                if (currentUser.role === 'admin') {
+                    updateAdminStats();
+                    renderAdminRecentScans();
+                    renderAdminAllScans();
+                    createCharts();
+                }
+                
+                // Re-enable button
+                scanJobBtnText.disabled = false;
+                scanJobBtnText.innerHTML = '<i class="fas fa-search"></i> Analyze Job Description';
+                
+                // Scroll to result
+                scanResultText.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Show success message
+                alert(`Analysis complete! Result: ${result.classification} with ${result.confidence}% confidence.`);
+            }, 1500);
+        });
+        
+        // User scanner functionality - Image mode
+        uploadAreaImage.addEventListener('click', () => {
+            imageUploadInput.click();
+        });
+        
+        imageUploadInput.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // Validate file type
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file (JPG, PNG, etc.)');
+                return;
+            }
+            
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                showElement(imagePreviewImage);
+            };
+            reader.readAsDataURL(file);
+            
+            // Show OCR status
+            showElement(ocrStatusImage);
+            ocrStatusText.textContent = 'Extracting text from image...';
+            
+            // Disable scan button
+            scanJobBtnImage.disabled = true;
+            
+            try {
+                // Extract text using OCR
+                const extractedText = await extractTextFromImage(file);
+                
+                // Hide OCR status
+                hideElement(ocrStatusImage);
+                
+                // Show extracted text
+                extractedTextImage.value = extractedText;
+                showElement(extractedTextContainerImage);
+                
+                // Enable scan button
+                scanJobBtnImage.disabled = false;
+                
+                // Hide any previous errors
+                hideElement(scanErrorImage);
+                hideElement(scanResultImage);
+            } catch (error) {
+                console.error('OCR Error:', error);
+                scanErrorImage.textContent = 'Failed to extract text from image. Please try again with a clearer image.';
+                showElement(scanErrorImage);
+                hideElement(ocrStatusImage);
+            }
+        });
+        
+        scanJobBtnImage.addEventListener('click', () => {
+            const extractedText = extractedTextImage.value.trim();
+            
+            if (!extractedText) {
+                scanErrorImage.textContent = 'No text extracted from image. Please upload a clearer image.';
+                showElement(scanErrorImage);
+                return;
+            }
+            
+            if (extractedText.length < 50) {
+                scanErrorImage.textContent = 'Extracted text is too short. Please upload an image with more text.';
+                showElement(scanErrorImage);
+                return;
+            }
+            
+            // Disable button and show loading
+            scanJobBtnImage.disabled = true;
+            scanJobBtnImage.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+            hideElement(scanErrorImage);
+            hideElement(scanResultImage);
+            
+            // Simulate API call with timeout
+            setTimeout(() => {
+                const result = simulateNLP(extractedText);
+                result.mode = 'image';
+                showScanResult(result, 'scanResultImage', 'image');
+                
+                // Save scan to database
+                const newScan = addNewScan(result);
+                
+                // Update UI
+                updateUserStatsDisplay();
+                renderUserHistory();
+                
+                // Update admin stats if admin is viewing
+                if (currentUser.role === 'admin') {
+                    updateAdminStats();
+                    renderAdminRecentScans();
+                    renderAdminAllScans();
+                    createCharts();
+                }
+                
+                // Re-enable button
+                scanJobBtnImage.disabled = false;
+                scanJobBtnImage.innerHTML = '<i class="fas fa-search"></i> Analyze Extracted Text';
+                
+                // Scroll to result
+                scanResultImage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Show success message
+                alert(`Analysis complete! Result: ${result.classification} with ${result.confidence}% confidence.`);
+            }, 1500);
+        });
+        
+        // User scanner functionality - Both mode
+        jobTextareaBoth.addEventListener('input', () => updateCharCount('jobTextareaBoth', 'charCountBoth'));
+        
+        clearTextBtnBoth.addEventListener('click', () => {
+            jobTextareaBoth.value = '';
+            updateCharCount('jobTextareaBoth', 'charCountBoth');
+            hideElement(scanErrorBoth);
+            hideElement(scanResultBoth);
+        });
+        
+        uploadAreaBoth.addEventListener('click', () => {
+            imageUploadInputBoth.click();
+        });
+        
+        imageUploadInputBoth.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // Validate file type
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file (JPG, PNG, etc.)');
+                return;
+            }
+            
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImageBoth.src = e.target.result;
+                showElement(imagePreviewBoth);
+            };
+            reader.readAsDataURL(file);
+            
+            // Show OCR status
+            showElement(ocrStatusBoth);
+            
+            try {
+                // Extract text using OCR
+                const extractedText = await extractTextFromImage(file);
+                
+                // Hide OCR status
+                hideElement(ocrStatusBoth);
+                
+                // Append extracted text to textarea
+                const currentText = jobTextareaBoth.value;
+                jobTextareaBoth.value = currentText + (currentText ? '\n\n' : '') + '[Extracted from image]:\n' + extractedText;
+                updateCharCount('jobTextareaBoth', 'charCountBoth');
+                
+                // Hide any previous errors
+                hideElement(scanErrorBoth);
+                hideElement(scanResultBoth);
+            } catch (error) {
+                console.error('OCR Error:', error);
+                scanErrorBoth.textContent = 'Failed to extract text from image. You can still analyze the text you entered.';
+                showElement(scanErrorBoth);
+                hideElement(ocrStatusBoth);
+            }
+        });
+        
+        scanJobBtnBoth.addEventListener('click', () => {
+            const combinedText = jobTextareaBoth.value.trim();
+            
+            if (!combinedText) {
+                scanErrorBoth.textContent = 'Please enter text or upload an image to analyze.';
+                showElement(scanErrorBoth);
+                return;
+            }
+            
+            if (combinedText.length < 50) {
+                scanErrorBoth.textContent = 'Please provide more content for analysis (at least 50 characters).';
+                showElement(scanErrorBoth);
+                return;
+            }
+            
+            // Disable button and show loading
+            scanJobBtnBoth.disabled = true;
+            scanJobBtnBoth.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+            hideElement(scanErrorBoth);
+            hideElement(scanResultBoth);
+            
+            // Simulate API call with timeout
+            setTimeout(() => {
+                const result = simulateNLP(combinedText);
+                result.mode = 'both';
+                showScanResult(result, 'scanResultBoth', 'both');
+                
+                // Save scan to database
+                const newScan = addNewScan(result);
+                
+                // Update UI
+                updateUserStatsDisplay();
+                renderUserHistory();
+                
+                // Update admin stats if admin is viewing
+                if (currentUser.role === 'admin') {
+                    updateAdminStats();
+                    renderAdminRecentScans();
+                    renderAdminAllScans();
+                    createCharts();
+                }
+                
+                // Re-enable button
+                scanJobBtnBoth.disabled = false;
+                scanJobBtnBoth.innerHTML = '<i class="fas fa-search"></i> Analyze Combined Content';
+                
+                // Scroll to result
+                scanResultBoth.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Show success message
+                alert(`Analysis complete! Result: ${result.classification} with ${result.confidence}% confidence.`);
+            }, 1500);
+        });
+        
+        // Search functionality
+        userSearchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#userHistoryTableBody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+        
+        adminSearchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const currentPage = adminPageTitle.textContent;
+            
+            if (currentPage === 'All Scans') {
+                const rows = document.querySelectorAll('#adminAllScansTableBody tr');
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            } else if (currentPage === 'User Management') {
+                const rows = document.querySelectorAll('#adminUsersTableBody tr');
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+        });
+        
+        // User settings functionality
+        privacyPolicyLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('Privacy Policy:\n\n1. We do not store your job descriptions or images on our servers.\n2. All analysis happens locally in your browser.\n3. We only store anonymized usage statistics if you opt-in.\n4. Your scan history is stored locally in your browser.\n5. You can delete your account data at any time.');
+        });
+        
+        resetNotifications.addEventListener('click', () => {
+            // Reset notification settings to defaults
+            document.getElementById('notifJobResults').checked = true;
+            document.getElementById('notifHighRisk').checked = true;
+            document.getElementById('notifAccountSecurity').checked = true;
+            
+            alert('Notification settings reset to defaults.');
+        });
+        
+        deleteConfirmInput.addEventListener('input', function() {
+            deleteAccountBtn.disabled = this.value.toUpperCase() !== 'DELETE';
+        });
+        
+        deleteAccountBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                // Delete user's scans
+                const userScans = allScans.filter(s => s.userId === currentUser.id);
+                userScans.forEach(scan => {
+                    const scanIndex = allScans.findIndex(s => s.id === scan.id);
+                    if (scanIndex !== -1) {
+                        allScans.splice(scanIndex, 1);
+                    }
+                });
+                
+                // Delete user
+                const userIndex = allUsers.findIndex(u => u.id === currentUser.id);
+                if (userIndex !== -1) {
+                    allUsers.splice(userIndex, 1);
+                    saveUsers();
+                    saveScans();
+                }
+                
+                // Clear local storage
+                localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+                localStorage.removeItem(STORAGE_KEYS.SETTINGS);
+                
+                // Show confirmation and redirect to auth page
+                alert('Account deleted successfully. You will be redirected to the login page.');
+                
+                currentUser = null;
+                hideElement(userDashboard);
+                showElement(authPage);
+                loginTabBtn.click();
+                loginEmail.value = '';
+                loginPassword.value = '';
+            }
+        });
+        
+        // Save settings on checkbox change
+        document.querySelectorAll('#userSettingsPage input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', saveUserSettings);
+        });
+        
+        // Logout functionality
+        userLogoutBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) {
+                currentUser = null;
+                localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+                hideElement(userDashboard);
+                showElement(authPage);
+                loginTabBtn.click();
+                loginEmail.value = '';
+                loginPassword.value = '';
+            }
+        });
+        
+        adminLogoutBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) {
+                currentUser = null;
+                localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+                hideElement(adminDashboard);
+                showElement(authPage);
+                loginTabBtn.click();
+                loginEmail.value = '';
+                loginPassword.value = '';
+            }
+        });
+        
+        // ============================================
+        // INITIALIZE APPLICATION - FIXED VERSION
+        // ============================================
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize data
+            initializeData();
+            
+            // Set default login tab
+            loginTabBtn.classList.add('active');
+            registerTabBtn.classList.remove('active');
+            showElement(loginForm);
+            hideElement(registerForm);
+            
+            // Update character count
+            updateCharCount('jobTextareaText', 'charCountText');
+            updateCharCount('jobTextareaBoth', 'charCountBoth');
+            
+            // Set demo credentials (pre-filled for convenience but not auto-login)
+            loginEmail.value = 'test@user.com';
+            loginPassword.value = 'password123';
+            
+            // DISABLED AUTO-LOGIN - User must click the login button
+            // If you want to test auto-login, uncomment the code below
+            /*
+            // Auto-login if user is already logged in
+            if (currentUser) {
+                if (currentUser.role === 'admin') {
+                    initializeAdminDashboard();
+                } else {
+                    initializeUserDashboard();
+                }
+            }
+            */
+        });
+    </script>
+</body>
+</html>
